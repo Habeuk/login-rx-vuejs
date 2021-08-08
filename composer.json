@@ -1,0 +1,16 @@
+{
+    "name": "stephane888/login_rx_vuejs",
+    "description": "connexion et inscription via les rx",
+    "type": "drupal-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "stephane888",
+            "email": "kksasteph888@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+    	"facebook/graph-sdk": "^5.7",
+    }
+}

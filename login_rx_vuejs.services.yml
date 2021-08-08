@@ -1,0 +1,4 @@
+services:
+  login_rx_vuejs.identification:
+    class: Drupal\login_rx_vuejs\Services\loginRxVuejs
+    arguments: ['@user.auth']
