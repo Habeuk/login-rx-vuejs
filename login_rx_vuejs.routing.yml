@@ -1,0 +1,33 @@
+login_rx_vuejs.example:
+  path: '/login-rx-vuejs/example'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::build'
+  requirements:
+    _permission: 'access content'
+
+
+login_rx_vuejs.check_user_status:
+  path: '/login-rx-vuejs/check-user-status'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::CheckUserStatus'
+  requirements:
+    _permission: 'access content'
+
+login_rx_vuejs.user_connexion:
+  path: '/login-rx-vuejs/user-connexion'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::userConnexion'
+  requirements:
+    _permission: 'access content'
+
+
+login_rx_vuejs.settings_form:
+  path: '/admin/config/system/login-rx-vuejs'
+  defaults:
+    _title: 'Login rx vuejs settings'
+    _form: 'Drupal\login_rx_vuejs\Form\SettingsForm'
+  requirements:
+    _permission: 'administer login_rx_vuejs configuration'

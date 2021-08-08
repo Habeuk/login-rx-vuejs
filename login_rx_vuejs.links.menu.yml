@@ -1,0 +1,6 @@
+login_rx_vuejs.settings_form:
+  title: Login rx vuejs
+  description: Configure Login rx vuejs.
+  parent: system.admin_config_system
+  route_name: login_rx_vuejs.settings_form
+  weight: 10
