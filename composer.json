@@ -1,7 +1,7 @@
 {
     "name": "stephane888/login_rx_vuejs",
     "description": "connexion et inscription via les rx",
-    "type": "drupal-module",
+    "type": "drupal-module-custom",
     "license": "MIT",
     "authors": [
         {
