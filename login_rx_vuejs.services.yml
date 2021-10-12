@@ -2,3 +2,8 @@ services:
   login_rx_vuejs.identification:
     class: Drupal\login_rx_vuejs\Services\loginRxVuejs
     arguments: ['@user.auth']
+
+  login_rx_vuejs.http_headers:
+    class: Drupal\login_rx_vuejs\EventSubscriber\loginRxVuejsSubscriber
+    tags:
+      - { name: event_subscriber }

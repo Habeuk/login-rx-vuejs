@@ -44,6 +44,38 @@ login_rx_vuejs.facebook_login:
   requirements:
     _permission: 'access content'
 
+
+#Verifie si un utilisateur est deja connecté, et connecte cet utilisateur.
+login_rx_vuejs.google_check:
+  path: '/login-rx-vuejs/google-check'
+  methods: [POST]
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::CheckUser'
+  requirements:
+    _permission: 'access content'
+
+#Verifie les informations d'un utilisateur et cree son compte.
+login_rx_vuejs.google_login:
+  path: '/login-rx-vuejs/google-login'
+  methods: [POST]
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::Connexion'
+  requirements:
+    _permission: 'access content'
+
+#Url de redirect de google.
+login_rx_vuejs.google_redirect:
+  path: '/login-rx-vuejs/google-redirect'
+  methods: [POST]
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::Callback'
+  requirements:
+    _permission: 'access content'
+
+
 login_rx_vuejs.settings_form:
   path: '/admin/config/system/login-rx-vuejs'
   defaults:
