@@ -9,47 +9,42 @@
  * This file is no longer required in Drupal 8.
  * @see https://www.drupal.org/node/2217931
  */
-function login_rx_vuejs_form_user_login_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
-{
-	//
+function login_rx_vuejs_form_user_login_form_alter(&$form,
+    \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  //
 }
 
 /**
  *
  * @param
- *        	$variables
+ *        $variables
  */
-function login_rx_vuejs_preprocess_page(&$variables)
-{
-	$keys = [
-			'#sorted',
-			'#theme_wrappers',
-			'#region',
-			'attributes'
-	];
-	$route_name = \Drupal::routeMatch()->getRouteName();
-	// dump( $route_name );
-	if ($route_name == "user.login" || $route_name == "user.register") {
-		if (isset($variables['page']['content'])) {
-			$blocks = $variables['page']['content'];
-			foreach ( $blocks as $i => $value ) {
-				if (! in_array($i, $keys)) {
-					unset($variables['page']['content'][$i]);
-				}
-			}
-			$variables['page']['content']['login_rx_vuejs'] = [
-					'#theme' => "login_rx_vuejs"
-			];
-			$variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
-		}
-	}
+function login_rx_vuejs_preprocess_page(&$variables) {
+  $keys = ['#sorted', '#theme_wrappers', '#region', 'attributes'
+  ];
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  // dump( $route_name );
+  if ($route_name == "user.login" || $route_name == "user.register") {
+    if (isset($variables['page']['content'])) {
+      $blocks = $variables['page']['content'];
+      foreach ($blocks as $i => $value) {
+        if (!in_array($i, $keys)) {
+          unset($variables['page']['content'][$i]);
+        }
+      }
+      $variables['page']['content']['login_rx_vuejs'] = [
+        '#theme' => "login_rx_vuejs"
+      ];
+      $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
+    }
+  }
 }
 
 /**
  * Pour une raison inconnu, ilne fonctionne pas en ligne.
  *
  * @param
- *        	$variables
+ *        $variables
  */
 /*
  * function login_rx_vuejs_preprocess_page__user(&$variables){
@@ -72,7 +67,8 @@ function login_rx_vuejs_preprocess_page(&$variables)
  * $variables['page']['content']['login_rx_vuejs'] = [
  * '#theme'=> "login_rx_vuejs"
  * ];
- * $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
+ * $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] =
+ * 'login_rx_vuejs/login_register';
  * }
  * }
  * }
@@ -81,12 +77,12 @@ function login_rx_vuejs_preprocess_page(&$variables)
 /**
  * -
  */
-function login_rx_vuejs_theme($existing, $type, $theme, $path)
-{
-	return [
-			'login_rx_vuejs' => [
-					'render element' => 'element'
-			]
-	];
+function login_rx_vuejs_theme($existing, $type, $theme, $path) {
+  return [
+    'login_rx_vuejs' => ['render element' => 'element',
+      'preprocess functions' => ['template_preprocess_ogin_rx_vuejs'
+      ], 'file' => 'login_rx_vuejs.theme.inc'
+    ]
+  ];
 }
 
