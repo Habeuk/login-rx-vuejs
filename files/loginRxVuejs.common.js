@@ -21247,6 +21247,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
 
     document.body.appendChild(form);
     form.submit();
+    window.clientLogin = external;
   },
   oautSignIn: function oautSignIn() {
     var self = this;
@@ -21332,13 +21333,12 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
    */
   typeOfLogin: function typeOfLogin() {
     var form = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    this.modeIframe = form;
 
     if (!form) {
       this.createSubmitForm();
-      this.modeIframe = false;
     } else {
       this.initLogin();
-      this.modeIframe = true;
     }
   },
   initLogin: function initLogin() {
