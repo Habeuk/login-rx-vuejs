@@ -1938,104 +1938,6 @@ module.exports = function (exec) {
 
 /***/ }),
 
-/***/ "320c":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
-
-
-/* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
-
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (err) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
-	}
-}
-
-module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
-
-
-/***/ }),
-
 /***/ "342f":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3930,20 +3832,6 @@ module.exports = !DESCRIPTORS && !fails(function () {
 
 /***/ }),
 
-/***/ "6453":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function (str) {
-	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
-		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
-	});
-};
-
-
-/***/ }),
-
 /***/ "6547":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4285,219 +4173,6 @@ module.exports = function bind(fn, thisArg) {
     }
     return fn.apply(thisArg, args);
   };
-};
-
-
-/***/ }),
-
-/***/ "72bf":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var strictUriEncode = __webpack_require__("6453");
-var objectAssign = __webpack_require__("320c");
-
-function encoderForArrayFormat(opts) {
-	switch (opts.arrayFormat) {
-		case 'index':
-			return function (key, value, index) {
-				return value === null ? [
-					encode(key, opts),
-					'[',
-					index,
-					']'
-				].join('') : [
-					encode(key, opts),
-					'[',
-					encode(index, opts),
-					']=',
-					encode(value, opts)
-				].join('');
-			};
-
-		case 'bracket':
-			return function (key, value) {
-				return value === null ? encode(key, opts) : [
-					encode(key, opts),
-					'[]=',
-					encode(value, opts)
-				].join('');
-			};
-
-		default:
-			return function (key, value) {
-				return value === null ? encode(key, opts) : [
-					encode(key, opts),
-					'=',
-					encode(value, opts)
-				].join('');
-			};
-	}
-}
-
-function parserForArrayFormat(opts) {
-	var result;
-
-	switch (opts.arrayFormat) {
-		case 'index':
-			return function (key, value, accumulator) {
-				result = /\[(\d*)\]$/.exec(key);
-
-				key = key.replace(/\[\d*\]$/, '');
-
-				if (!result) {
-					accumulator[key] = value;
-					return;
-				}
-
-				if (accumulator[key] === undefined) {
-					accumulator[key] = {};
-				}
-
-				accumulator[key][result[1]] = value;
-			};
-
-		case 'bracket':
-			return function (key, value, accumulator) {
-				result = /(\[\])$/.exec(key);
-				key = key.replace(/\[\]$/, '');
-
-				if (!result) {
-					accumulator[key] = value;
-					return;
-				} else if (accumulator[key] === undefined) {
-					accumulator[key] = [value];
-					return;
-				}
-
-				accumulator[key] = [].concat(accumulator[key], value);
-			};
-
-		default:
-			return function (key, value, accumulator) {
-				if (accumulator[key] === undefined) {
-					accumulator[key] = value;
-					return;
-				}
-
-				accumulator[key] = [].concat(accumulator[key], value);
-			};
-	}
-}
-
-function encode(value, opts) {
-	if (opts.encode) {
-		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
-	}
-
-	return value;
-}
-
-function keysSorter(input) {
-	if (Array.isArray(input)) {
-		return input.sort();
-	} else if (typeof input === 'object') {
-		return keysSorter(Object.keys(input)).sort(function (a, b) {
-			return Number(a) - Number(b);
-		}).map(function (key) {
-			return input[key];
-		});
-	}
-
-	return input;
-}
-
-exports.extract = function (str) {
-	return str.split('?')[1] || '';
-};
-
-exports.parse = function (str, opts) {
-	opts = objectAssign({arrayFormat: 'none'}, opts);
-
-	var formatter = parserForArrayFormat(opts);
-
-	// Create an object with no prototype
-	// https://github.com/sindresorhus/query-string/issues/47
-	var ret = Object.create(null);
-
-	if (typeof str !== 'string') {
-		return ret;
-	}
-
-	str = str.trim().replace(/^(\?|#|&)/, '');
-
-	if (!str) {
-		return ret;
-	}
-
-	str.split('&').forEach(function (param) {
-		var parts = param.replace(/\+/g, ' ').split('=');
-		// Firefox (pre 40) decodes `%3D` to `=`
-		// https://github.com/sindresorhus/query-string/pull/37
-		var key = parts.shift();
-		var val = parts.length > 0 ? parts.join('=') : undefined;
-
-		// missing `=` should be `null`:
-		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeURIComponent(val);
-
-		formatter(decodeURIComponent(key), val, ret);
-	});
-
-	return Object.keys(ret).sort().reduce(function (result, key) {
-		var val = ret[key];
-		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
-			// Sort object keys, not values
-			result[key] = keysSorter(val);
-		} else {
-			result[key] = val;
-		}
-
-		return result;
-	}, Object.create(null));
-};
-
-exports.stringify = function (obj, opts) {
-	var defaults = {
-		encode: true,
-		strict: true,
-		arrayFormat: 'none'
-	};
-
-	opts = objectAssign(defaults, opts);
-
-	var formatter = encoderForArrayFormat(opts);
-
-	return obj ? Object.keys(obj).sort().map(function (key) {
-		var val = obj[key];
-
-		if (val === undefined) {
-			return '';
-		}
-
-		if (val === null) {
-			return encode(key, opts);
-		}
-
-		if (Array.isArray(val)) {
-			var result = [];
-
-			val.slice().forEach(function (val2) {
-				if (val2 === undefined) {
-					return;
-				}
-
-				result.push(formatter(key, val2, result.length));
-			});
-
-			return result.join('&');
-		}
-
-		return encode(key, opts) + '=' + encode(val, opts);
-	}).filter(function (x) {
-		return x.length > 0;
-	}).join('&') : '';
 };
 
 
@@ -11257,12 +10932,12 @@ if (typeof window !== 'undefined') {
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"2c0a9802-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App/components/loginRegister.vue?vue&type=template&id=54bf68af&
-var loginRegistervue_type_template_id_54bf68af_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('ValidationObserver',{ref:"formValidate",attrs:{"tag":"form"}},[_c('div',{staticClass:"login-page"},[(_vm.alertDisplay)?_c('div',{staticClass:"alert w-100",class:_vm.alertType,attrs:{"role":"alert"},domProps:{"innerHTML":_vm._s(_vm.alertText)}}):_vm._e(),(_vm.isBusy)?_c('div',{staticClass:"spinner-grow text-primary",staticStyle:{"width":"3rem","height":"3rem"},attrs:{"role":"status"}},[_c('span',{staticClass:"sr-only"},[_vm._v("Loading...")])]):_vm._e(),_c('transition',{attrs:{"name":"customslide"}},[(_vm.stepe === 'checkstatus')?_c('div',{key:'checkstatus',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('p',[_vm._v("Connectez vous avec")]),_c('div',{staticClass:"content-center__btn-column"},[_c('div',{staticClass:"btn-login btn-login--google",on:{"click":_vm.loginGoogle}},[_c('i',{staticClass:"btn-login__icon icon-google-circles"}),_c('span',{staticClass:"btn-login__text"},[_vm._v(" Google ")]),(_vm.waiting === 'google')?_c('svgWaiting'):_vm._e()],1),_c('div',{staticClass:"btn-login btn-login--facebook",on:{"click":_vm.loginFacebook}},[_c('span',{staticClass:"btn-login__icon icon-facebook"}),_c('i',{staticClass:"btn-login__text"},[_vm._v(" Facebook ")]),(_vm.waiting === 'facebook')?_c('svgWaiting'):_vm._e()],1)]),_c('strong',{staticClass:"d-block"},[_vm._v(" Ou ")]),_c('hr',{staticClass:"diviseur"}),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.log_email))]),_c('div',{staticClass:"form-group content-center__input"},[_c('ValidationProvider',{attrs:{"name":"name","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.login_check),expression:"login_check"}],staticClass:"form-control",attrs:{"type":"text","name":"name"},domProps:{"value":(_vm.login_check)},on:{"input":function($event){if($event.target.composing){ return; }_vm.login_check=$event.target.value}}}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,2271490516)})],1),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.checkUserStatus}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.first)+" ")]),(_vm.waiting === 'wait')?_c('svgWaiting'):_vm._e()],1)])])]):_vm._e(),(_vm.stepe === 'final-fb-register' || _vm.stepe === 'final-gl-register')?_c('div',{key:'checkstatus',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('p',[_vm._v("Finaliser votre connexion")]),_vm._l((_vm.templates),function(temp,i){return _c('ValidationProvider',{key:i,ref:temp.ref,refInFor:true,staticClass:"content-center__input",scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c(temp,{tag:"component"}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,true)})}),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.finalRegister}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.final)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])],2)]):_vm._e(),(_vm.stepe === 'setPassword')?_c('div',{key:'setPassword',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.pass))]),_c('div',{staticClass:"form-group content-center__input"},[_c('ValidationProvider',{ref:"refPass",attrs:{"name":"pass","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.password),expression:"password"}],staticClass:"form-control",attrs:{"type":"password","name":"pass"},domProps:{"value":(_vm.password)},on:{"input":function($event){if($event.target.composing){ return; }_vm.password=$event.target.value}}}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,1164253440)})],1),_c('a',{staticClass:"content-center__forgot-pass",attrs:{"href":"/user/password"}},[_vm._v(" Mot de passe oublié ? ")]),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.Login}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.connect)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])])]):_vm._e(),(_vm.stepe === 'register')?_c('div',{key:'register',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.login))]),_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.login_check),expression:"login_check"}],staticClass:"form-control",attrs:{"type":"text","readonly":"true","name":"name"},domProps:{"value":(_vm.login_check)},on:{"input":function($event){if($event.target.composing){ return; }_vm.login_check=$event.target.value}}})]),(_vm.showPassword)?_c('h3',{staticClass:"content-center__title"},[_vm._v(" "+_vm._s(_vm.messages.pass)+" ")]):_vm._e(),(_vm.showPassword)?_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.password),expression:"password"}],staticClass:"form-control",attrs:{"type":"password","name":"pass"},domProps:{"value":(_vm.password)},on:{"input":function($event){if($event.target.composing){ return; }_vm.password=$event.target.value}}})]):_vm._e(),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.mail))]),_c('ValidationProvider',{ref:"mail",staticClass:"d-block w-100",attrs:{"name":"mail","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.mail),expression:"mail"}],staticClass:"form-control",attrs:{"type":"mail","name":"mail"},domProps:{"value":(_vm.mail)},on:{"input":function($event){if($event.target.composing){ return; }_vm.mail=$event.target.value}}})]),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,620003705)}),_vm._l((_vm.templates),function(temp,i){return _c('ValidationProvider',{key:i,ref:temp.ref,refInFor:true,staticClass:"content-center__input",scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c(temp,{tag:"component"}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,true)})}),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.Register}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.register)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])],2)]):_vm._e()])],1)])}
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"2c0a9802-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App/components/loginRegister.vue?vue&type=template&id=ccb1a5b8&
+var loginRegistervue_type_template_id_ccb1a5b8_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('ValidationObserver',{ref:"formValidate",attrs:{"tag":"form"}},[_c('div',{staticClass:"login-page"},[(_vm.alertDisplay)?_c('div',{staticClass:"alert w-100",class:_vm.alertType,attrs:{"role":"alert"},domProps:{"innerHTML":_vm._s(_vm.alertText)}}):_vm._e(),(_vm.isBusy)?_c('div',{staticClass:"spinner-grow text-primary",staticStyle:{"width":"3rem","height":"3rem"},attrs:{"role":"status"}},[_c('span',{staticClass:"sr-only"},[_vm._v("Loading...")])]):_vm._e(),_c('transition',{attrs:{"name":"customslide"}},[(_vm.stepe === 'checkstatus')?_c('div',{key:'checkstatus',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('p',[_vm._v("Connectez vous avec")]),_c('div',{staticClass:"content-center__btn-column"},[_c('div',{staticClass:"mb-3",attrs:{"id":"goole-login-tab"}}),_c('div',{staticClass:"btn-login btn-login--facebook",on:{"click":_vm.loginFacebook}},[_c('span',{staticClass:"btn-login__icon icon-facebook"}),_c('i',{staticClass:"btn-login__text"},[_vm._v(" Facebook ")]),(_vm.waiting === 'facebook')?_c('svgWaiting'):_vm._e()],1)]),_c('strong',{staticClass:"d-block"},[_vm._v(" Ou ")]),_c('hr',{staticClass:"diviseur"}),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.log_email))]),_c('div',{staticClass:"form-group content-center__input"},[_c('ValidationProvider',{attrs:{"name":"name","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.login_check),expression:"login_check"}],staticClass:"form-control",attrs:{"type":"text","name":"name"},domProps:{"value":(_vm.login_check)},on:{"input":function($event){if($event.target.composing){ return; }_vm.login_check=$event.target.value}}}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,2271490516)})],1),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.checkUserStatus}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.first)+" ")]),(_vm.waiting === 'wait')?_c('svgWaiting'):_vm._e()],1)])])]):_vm._e(),(_vm.stepe === 'final-fb-register' || _vm.stepe === 'final-gl-register')?_c('div',{key:'checkstatus',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('p',[_vm._v("Finaliser votre connexion")]),_vm._l((_vm.templates),function(temp,i){return _c('ValidationProvider',{key:i,ref:temp.ref,refInFor:true,staticClass:"content-center__input",scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c(temp,{tag:"component"}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,true)})}),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.finalRegister}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.final)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])],2)]):_vm._e(),(_vm.stepe === 'setPassword')?_c('div',{key:'setPassword',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.pass))]),_c('div',{staticClass:"form-group content-center__input"},[_c('ValidationProvider',{ref:"refPass",attrs:{"name":"pass","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.password),expression:"password"}],staticClass:"form-control",attrs:{"type":"password","name":"pass"},domProps:{"value":(_vm.password)},on:{"input":function($event){if($event.target.composing){ return; }_vm.password=$event.target.value}}}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,1164253440)})],1),_c('a',{staticClass:"content-center__forgot-pass",attrs:{"href":"/user/password"}},[_vm._v(" Mot de passe oublié ? ")]),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.Login}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.connect)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])])]):_vm._e(),(_vm.stepe === 'register')?_c('div',{key:'register',staticClass:"block-center"},[_c('div',{staticClass:"content-center"},[_c('a',{staticClass:"content-center__img",attrs:{"href":"/"}},[_c('img',{attrs:{"src":_vm.urlLogo,"alt":""}})]),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.login))]),_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.login_check),expression:"login_check"}],staticClass:"form-control",attrs:{"type":"text","readonly":"true","name":"name"},domProps:{"value":(_vm.login_check)},on:{"input":function($event){if($event.target.composing){ return; }_vm.login_check=$event.target.value}}})]),(_vm.showPassword)?_c('h3',{staticClass:"content-center__title"},[_vm._v(" "+_vm._s(_vm.messages.pass)+" ")]):_vm._e(),(_vm.showPassword)?_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.password),expression:"password"}],staticClass:"form-control",attrs:{"type":"password","name":"pass"},domProps:{"value":(_vm.password)},on:{"input":function($event){if($event.target.composing){ return; }_vm.password=$event.target.value}}})]):_vm._e(),_c('h3',{staticClass:"content-center__title"},[_vm._v(_vm._s(_vm.messages.mail))]),_c('ValidationProvider',{ref:"mail",staticClass:"d-block w-100",attrs:{"name":"mail","rules":"required"},scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c('div',{staticClass:"form-group content-center__input"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.mail),expression:"mail"}],staticClass:"form-control",attrs:{"type":"mail","name":"mail"},domProps:{"value":(_vm.mail)},on:{"input":function($event){if($event.target.composing){ return; }_vm.mail=$event.target.value}}})]),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,false,620003705)}),_vm._l((_vm.templates),function(temp,i){return _c('ValidationProvider',{key:i,ref:temp.ref,refInFor:true,staticClass:"content-center__input",scopedSlots:_vm._u([{key:"default",fn:function(v){return [_c(temp,{tag:"component"}),_c('div',{staticClass:"text-danger text-small"},_vm._l((v.errors),function(error,ii){return _c('small',{key:ii,staticClass:"d-block"},[_vm._v(" "+_vm._s(error)+" ")])}),0)]}}],null,true)})}),_c('div',{staticClass:"content-center__btn"},[_c('div',{staticClass:"btn-login btn-login--connexion",on:{"click":_vm.Register}},[_c('span',{staticClass:"btn-login__text"},[_vm._v(" "+_vm._s(_vm.messages.submit.register)+" ")]),(_vm.waiting == 'wait')?_c('svgWaiting'):_vm._e()],1)])],2)]):_vm._e()])],1)])}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/App/components/loginRegister.vue?vue&type=template&id=54bf68af&
+// CONCATENATED MODULE: ./src/App/components/loginRegister.vue?vue&type=template&id=ccb1a5b8&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.to-string.js
 var es_object_to_string = __webpack_require__("d3b7");
@@ -20881,7 +20556,7 @@ var params$4 = [
         }
     }
 ];
-var rules_regex = {
+var regex = {
     validate: validate$4,
     params: params$4
 };
@@ -21142,249 +20817,6 @@ window.fbAsyncInit = function () {
   fjs.parentNode.insertBefore(js, fjs);
 })(document, "script", "facebook-jssdk");
 /**/
-// EXTERNAL MODULE: ./node_modules/query-string/index.js
-var query_string = __webpack_require__("72bf");
-var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
-
-// CONCATENATED MODULE: ./src/App/rx/google.js
-
-
-
-//const gapi = window.gapi;
-
-/* harmony default export */ var google = ({
-  user: {},
-  userLocal: {},
-  isConnected: false,
-  gapi: null,
-  api_key: "",
-  client_id: "666466407349-oanmp950m4pp4arec1fcp8okvj6so4cj.apps.googleusercontent.com",
-  scope: "email profile",
-  redirect_uri: "https://lesroisdelareno.fr/user/login",
-  closePopUp: true,
-  modeIframe: false,
-  query: {},
-  loadGapi: function loadGapi() {
-    var _this = this;
-
-    var head = document.getElementsByTagName("head")[0];
-    var gapi = document.createElement("script");
-    head.appendChild(gapi);
-    gapi.id = "gapi-jsgo"; //gapi.setAttribute("async", "");
-    //gapi.setAttribute("defer", "");
-    // gapi.addEventListener("load", () => {
-    //   console.log("Chargement du JS Google END;");
-    // });
-
-    gapi.onload = function () {
-      _this.initGoogleApi();
-    };
-
-    gapi.src = "https://apis.google.com/js/platform.js?onload=";
-  },
-  initGoogleApi: function initGoogleApi() {
-    var _this2 = this;
-
-    var self = this;
-    var nbr = 0; // var gapi = self.gapi;
-
-    if (window.gapi && nbr < 10) {
-      self.checkLocalStorage();
-      self.gapi = window.gapi;
-      self.gapi.load("auth2", function () {
-        self.gapi.auth2.init({
-          clientId: self.client_id,
-          apiKey: self.api_key,
-          scope: self.scope,
-          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
-        }).then(function (res) {
-          self.isConnected = self.gapi.auth2.getAuthInstance().isSignedIn.get;
-          self.checkParams();
-          console.log("gapi", window.gapi); // self.checkIfConnected();
-
-          self.onSuccess(res); // self.checkLocalStorage();
-        }, function (error) {
-          self.onFaillure(error);
-        });
-      });
-    } else {
-      // console.log("Google not load");
-      nbr++;
-      setTimeout(function () {
-        _this2.initGoogleApi();
-      }, 900);
-    }
-  },
-
-  /**
-   * Get access token
-   */
-  createSubmitForm: function createSubmitForm() {
-    var self = this;
-    var external = window.open("", "external", "width=450,height=600,left=100,top=50");
-    var endPoint = "https://accounts.google.com/o/oauth2/v2/auth";
-    var doc = external.document;
-    var form = doc.createElement("form");
-    form.setAttribute("method", "GET");
-    form.setAttribute("action", endPoint);
-    form.target = "external";
-    var params = {
-      client_id: self.client_id,
-      redirect_uri: self.redirect_uri,
-      response_type: "token",
-      scope: "profile email",
-      include_granted_scopes: "true",
-      state: "kksa-888"
-    };
-
-    for (var p in params) {
-      var input = external.document.createElement("input");
-      input.setAttribute("type", "hidden");
-      input.setAttribute("name", p);
-      input.setAttribute("value", params[p]);
-      form.appendChild(input);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-    window.clientLogin = external;
-  },
-  oautSignIn: function oautSignIn() {
-    var self = this;
-    var endPoint = "https://accounts.google.com/o/oauth2/v2/auth";
-    var form = document.createElement("form");
-    form.setAttribute("method", "GET");
-    form.setAttribute("action", endPoint);
-    var params = {
-      client_id: self.client_id,
-      redirect_uri: self.redirect_uri,
-      response_type: "token",
-      scope: "profile email",
-      include_granted_scopes: "true",
-      state: "kksa-888"
-    };
-
-    for (var p in params) {
-      var input = document.createElement("input");
-      input.setAttribute("type", "hidden");
-      input.setAttribute("name", p);
-      input.setAttribute("value", params[p]);
-      form.appendChild(input);
-    } // Add form to page and submit it to open the OAuth 2.0 endpoint.
-
-
-    if (self.user && self.user.access_token) {
-      //console.log("user", self.user);
-      var event = new CustomEvent("wbu-gl-status-change");
-      document.dispatchEvent(event);
-    } else {
-      document.body.appendChild(form);
-      form.submit();
-    }
-  },
-  checkLocalStorage: function checkLocalStorage() {
-    var self = this;
-    var local = window.localStorage.getItem("user-google");
-
-    if (local !== null) {
-      self.userLocal = JSON.parse(local);
-      self.user = self.userLocal;
-      console.log("local", self.user);
-    } else {
-      console.log("localRien", self.UserLocal);
-    }
-  },
-  checkParams: function checkParams() {
-    var self = this;
-    this.query = query_string_default.a.parse(window.location.hash);
-    console.log("window.location :", window.location);
-    console.log("this.query : ", this.query); //	var host = window.location.origin;
-
-    var fragmentString = location.hash.substring(1);
-    var params = {}; //var localUser = JSON.parse(window.localStorage.getItem("user-google"));
-
-    var regex = /([^&=]+)=([^&]*)/g,
-        m;
-
-    while (m = regex.exec(fragmentString)) {
-      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-    }
-
-    if (Object.keys(params).length > 0) {
-      console.log("userae", params);
-
-      if (params["state"] && params["state"] == "kksa-888") {
-        //	window.localStorage.setItem("user-google", JSON.stringify(params));
-        //this.checkLocalStorage();
-        self.user = self.query;
-        console.log("user before : ", self.user);
-        var event = new CustomEvent("wbu-gl-status-change");
-        document.dispatchEvent(event); //window.history.replaceState(null, null, window.location.pathname);
-      }
-    }
-  },
-
-  /**
-   * Permet de selectionner le mode d'ouverture du block d'authentification google.
-   * if form true (valeur par defaut), on ouvre le block d'authentification dans la fenetre encours.
-   * Si non, on ouvre dans un iframe(popup), ensuite les informations seront renvoyées vers le iframes principales.
-   *
-   * @param {*} form
-   */
-  typeOfLogin: function typeOfLogin() {
-    var form = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    this.modeIframe = form;
-
-    if (!form) {
-      this.createSubmitForm();
-    } else {
-      this.initLogin();
-    }
-  },
-  initLogin: function initLogin() {
-    var self = this;
-    var gapi = self.gapi; // self.isConnected = window.gapi.auth2.getAuthInstance().isSignedIn.get();
-    // console.log("connected", self.isConnected);
-
-    var auth = gapi.auth2.getAuthInstance();
-    auth.signIn({
-      scope: "email profile openid",
-      response_type: "access_token",
-      state: "kksa-888",
-      ux_mode: "redirect",
-      include_granted_scopes: "true",
-      prompt: "consent",
-      redirect_uri: self.redirect_uri
-    }).then(function (reponse) {
-      self.onSignIn(reponse);
-      /*  traiter la réponse  */
-    });
-  },
-  initLogOut: function initLogOut() {
-    var auth = self.gapi.auth2.getAuthInstance();
-    auth.signOut().then(function (res) {
-      this.onSuccess(res);
-    });
-  },
-  onSignIn: function onSignIn(googleUser) {
-    var profile = googleUser.getBasicProfile();
-    this.user = {
-      id: profile.getId(),
-      name: profile.getName(),
-      imgUrl: profile.getImageUrl(),
-      email: profile.getEmail()
-    };
-    console.log("user", this.user);
-    var event = new CustomEvent("wbu-gl-status-change");
-    document.dispatchEvent(event);
-  },
-  onSuccess: function onSuccess(r) {
-    console.log("Initialisation de l'app réussi : ", r);
-  },
-  onFaillure: function onFaillure(resp) {
-    console.log("Échec de l'opération : ", resp);
-  }
-});
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App/components/loginRegister.vue?vue&type=script&lang=js&
 
 
@@ -21654,11 +21086,6 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
 //
 //
 //
-//
-//
-//
-//
-
 
 
 
@@ -21718,15 +21145,13 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
   mounted: function mounted() {
     facebook.appId = 889256191665205;
     this.TryToLoginWithFacebook();
-    facebook.chargement(); //
-
-    this.TryToLoginWithGoogle();
-    google.checkParams(); // rxGoogle.client_id =
+    facebook.chargement(); // rxGoogle.client_id =
     // "1076442032003-82nt70v46plap18r8fgkofblm8d3lkng.apps.googleusercontent.com";
     // rxGoogle.client_id = "666466407349-oanmp950m4pp4arec1fcp8okvj6so4cj.apps.googleusercontent.com";
-
-    google.client_id = "90673796165-fndv3eu9tog6b9g5p8camiueffcfdc8p.apps.googleusercontent.com";
-    google.loadGapi(); //
+    // rxGoogle.client_id =
+    //   "90673796165-fndv3eu9tog6b9g5p8camiueffcfdc8p.apps.googleusercontent.com";
+    //rxGoogle.loadGapi();
+    //
 
     this.getUserInfoFromFrame();
   },
@@ -21769,61 +21194,6 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
         });
       }, false);
     },
-
-    /**
-     * Ecoute un evenement afin de determiner si l'utilisateur a clique sur le bonton de connexion et que le processus soit terminé.
-     */
-    TryToLoginWithGoogle: function TryToLoginWithGoogle() {
-      var _this2 = this;
-
-      document.addEventListener("wbu-gl-status-change", function () {
-        _this2.IsBusy();
-
-        _this2.getFields();
-
-        App_utilities.post("/login-rx-vuejs/google-check", google.user).then(function (resp) {
-          _this2.isBusy = false;
-          _this2.alertDisplay = true;
-          _this2.alertType = "alert-success";
-          _this2.alertText = "Connexion réussie";
-          console.log(" TryToLoginWithGoogle : ", resp); // --;
-          // modeIframe
-
-          if (!google.modeIframe) {
-            // on verifie si on est dans la iframe.
-            var event = new CustomEvent("user_is_connect", {
-              detail: resp.data
-            });
-            window.opener.document.dispatchEvent(event);
-            window.close();
-            return;
-          } // --; Si l'utilisateur est redirigé vers un autre domaine.
-
-
-          if (resp.reponse && resp.reponse.config.url !== resp.reponse.request.responseURL) {
-            window.location.assign(resp.reponse.request.responseURL);
-          } // Il faut s'assurer que les données sont ok.
-          else if (resp.data && resp.data.createuser) {
-            _this2.stepe = "final-gl-register";
-          } else {
-            window.location.assign(window.location.origin);
-          }
-        })["catch"](function (errors) {
-          _this2.isBusy = false;
-          _this2.alertDisplay = true;
-          _this2.alertType = "alert-danger";
-          _this2.alertText = "Google : Erreur de connexion";
-
-          if (errors.error) {
-            _this2.alertText = errors.error.statusText;
-          }
-
-          console.log(" Error ajax ", errors.error);
-          console.log(" Error ajax ", errors.code);
-          console.log(" Error ajax ", errors.stack);
-        });
-      }, false);
-    },
     IsBusy: function IsBusy() {
       this.isBusy = true;
       console.log("this.isbusy", this.isBusy);
@@ -21835,21 +21205,17 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
     logOutFacebook: function logOutFacebook() {
       facebook.logOut();
     },
-    loginGoogle: function loginGoogle() {
-      this.waiting = "google";
-      google.typeOfLogin(false);
-    },
 
     /**
      * --
      */
     getFields: function getFields() {
-      var _this3 = this;
+      var _this2 = this;
 
       var fds = new formatFieldsBootstrap("user", "user");
       fds.format().then(function (resp) {
-        _this3.templates = resp.templates;
-        _this3.models = resp.models;
+        _this2.templates = resp.templates;
+        _this2.models = resp.models;
       });
     },
 
@@ -21857,7 +21223,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
      * --
      */
     checkUserStatus: function checkUserStatus() {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
         var url, test;
@@ -21865,25 +21231,25 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _this4.waiting = "wait";
+                _this3.waiting = "wait";
                 url = "/login-rx-vuejs/check-user-status";
                 _context.next = 4;
-                return _this4.$refs.formValidate.validate();
+                return _this3.$refs.formValidate.validate();
 
               case 4:
                 test = _context.sent;
                 if (test) App_utilities.post(url, {
                   name: [{
-                    value: _this4.login_check
+                    value: _this3.login_check
                   }]
                 }).then(function (resp) {
-                  _this4.waiting = "";
-                  if (resp.data) _this4.stepe = "setPassword";else {
-                    _this4.getFields();
+                  _this3.waiting = "";
+                  if (resp.data) _this3.stepe = "setPassword";else {
+                    _this3.getFields();
 
-                    _this4.stepe = "register";
+                    _this3.stepe = "register";
                   }
-                });else _this4.waiting = "";
+                });else _this3.waiting = "";
 
               case 6:
               case "end":
@@ -21898,7 +21264,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
      * --
      */
     Login: function Login() {
-      var _this5 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var url, test;
@@ -21906,23 +21272,23 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _this5.waiting = "wait";
+                _this4.waiting = "wait";
                 url = "/login-rx-vuejs/user-connexion";
                 _context2.next = 4;
-                return _this5.$refs.formValidate.validate();
+                return _this4.$refs.formValidate.validate();
 
               case 4:
                 test = _context2.sent;
                 if (test) App_utilities.post(url, {
                   name: [{
-                    value: _this5.login_check
+                    value: _this4.login_check
                   }],
                   password: [{
-                    value: _this5.password
+                    value: _this4.password
                   }]
                 }).then(function (resp) {
-                  _this5.waiting = "";
-                  if (resp) _this5.stepe = "setPassword";
+                  _this4.waiting = "";
+                  if (resp) _this4.stepe = "setPassword";
 
                   if (resp.reponse && resp.reponse.config.url !== resp.reponse.request.responseURL) {
                     window.location.assign(resp.reponse.request.responseURL);
@@ -21930,10 +21296,10 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
                     window.location.assign("/");
                   }
                 })["catch"](function (e) {
-                  _this5.$refs.refPass.setErrors([e.error.statusText]);
+                  _this4.$refs.refPass.setErrors([e.error.statusText]);
 
-                  _this5.waiting = "error";
-                });else _this5.waiting = "";
+                  _this4.waiting = "error";
+                });else _this4.waiting = "";
 
               case 6:
               case "end":
@@ -21948,7 +21314,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
      * --
      */
     finalRegister: function finalRegister() {
-      var _this6 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var params, url, test;
@@ -21956,32 +21322,32 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this6.waiting = "wait";
+                _this5.waiting = "wait";
                 params = {};
                 url = "";
 
-                if (_this6.stepe === "final-gl-register") {
+                if (_this5.stepe === "final-gl-register") {
                   url = "/login-rx-vuejs/google-login";
                   params = {
-                    fields: _this6.models,
-                    google: google.user
+                    fields: _this5.models,
+                    google: []
                   };
-                } else if (_this6.stepe === "final-fb-register") {
+                } else if (_this5.stepe === "final-fb-register") {
                   url = "/login-rx-vuejs/facebook-login";
                   params = {
-                    fields: _this6.models,
+                    fields: _this5.models,
                     facebook: facebook.user
                   };
                 }
 
                 _context3.next = 6;
-                return _this6.$refs.formValidate.validate();
+                return _this5.$refs.formValidate.validate();
 
               case 6:
                 test = _context3.sent;
                 if (test) App_utilities.post(url, params).then(function (resp) {
                   console.log(resp);
-                  _this6.waiting = "";
+                  _this5.waiting = "";
 
                   if (resp.reponse && resp.reponse.config.url !== resp.reponse.request.responseURL) {
                     window.location.assign(resp.reponse.request.responseURL);
@@ -22001,7 +21367,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
      * --
      */
     Register: function Register() {
-      var _this7 = this;
+      var _this6 = this;
 
       this.waiting = "wait";
       this.$set(this.models, "name", [{
@@ -22016,8 +21382,8 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
       var url = "/user/register?_format=json";
       App_utilities.post(url, this.models).then(function (resp) {
         console.log("resp : ", resp);
-        _this7.waiting = "";
-        components_config.modalSuccess(components_config.msgCreate([_this7.messages.devisCreateUser]), {
+        _this6.waiting = "";
+        components_config.modalSuccess(components_config.msgCreate([_this6.messages.devisCreateUser]), {
           title: "Votre compte a été crré",
           footerClass: "d-none",
           headerBgVariant: "success",
@@ -22026,7 +21392,7 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
         setTimeout(function () {// window.location.assign("/");
         }, 5000);
       })["catch"](function (e) {
-        _this7.waiting = ""; //console.log("catch : ", e);
+        _this6.waiting = ""; //console.log("catch : ", e);
 
         if (e.error && e.error.data && e.error.data.errors) {
           var errors = e.error.data.errors; //console.log(" this.$refs : ", this.$refs);
@@ -22034,10 +21400,10 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
           errors.forEach(function (error) {
             var field = error.split(":"); // console.log(" field : ", field);
 
-            if (_this7.$refs[field[0]]) {
-              if (_this7.$refs[field[0]][0]) {
-                _this7.$refs[field[0]][0].setErrors([field[1]]);
-              } else _this7.$refs[field[0]].setErrors([field[1]]);
+            if (_this6.$refs[field[0]]) {
+              if (_this6.$refs[field[0]][0]) {
+                _this6.$refs[field[0]][0].setErrors([field[1]]);
+              } else _this6.$refs[field[0]].setErrors([field[1]]);
             }
           });
         }
@@ -22048,9 +21414,22 @@ var query_string_default = /*#__PURE__*/__webpack_require__.n(query_string);
      *  --
      */
     getUserInfoFromFrame: function getUserInfoFromFrame() {
-      document.addEventListener("user_is_connect", function (e) {
-        console.log("Result event : ", e);
-      });
+      function handleCredentialResponse(response) {
+        console.log("Encoded JWT ID token: " + response.credential);
+      }
+
+      window.onload = function () {
+        window.google.accounts.id.initialize({
+          client_id: "513247959752-qapd9jb30pdtoh51m0h53070a2v8c4er.apps.googleusercontent.com",
+          callback: handleCredentialResponse
+        });
+        window.google.accounts.id.renderButton(document.getElementById("goole-login-tab"), {
+          theme: "outline",
+          size: "large"
+        } // customization attributes
+        );
+        window.google.accounts.id.prompt(); // also display the One Tap dialog
+      };
     }
   }
 });
@@ -22070,7 +21449,7 @@ var loginRegistervue_type_style_index_0_lang_scss_ = __webpack_require__("f073")
 
 var loginRegister_component = Object(componentNormalizer["a" /* default */])(
   components_loginRegistervue_type_script_lang_js_,
-  loginRegistervue_type_template_id_54bf68af_render,
+  loginRegistervue_type_template_id_ccb1a5b8_render,
   staticRenderFns,
   false,
   null,
