@@ -13,8 +13,13 @@ class SdkGoogle {
     if (!empty($googleUser['client_id'])) {
       $client = new GoogleClient(['client_id' => $googleUser['client_id']
       ]);
+      $payload = null;
       // Specify the CLIENT_ID of the app that accesses the backend
-      $payload = $client->verifyIdToken($googleUser['id_token']);
+      if (!empty($googleUser['id_token']))
+        $payload = $client->verifyIdToken($googleUser['id_token']);
+      elseif (!empty($googleUser['credential']))
+        $payload = $client->verifyIdToken($googleUser['credential']);
+      //
       if ($payload) {
         return $payload;
       }
