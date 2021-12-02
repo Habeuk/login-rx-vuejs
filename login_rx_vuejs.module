@@ -9,8 +9,7 @@
  * This file is no longer required in Drupal 8.
  * @see https://www.drupal.org/node/2217931
  */
-function login_rx_vuejs_form_user_login_form_alter(&$form,
-    \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function login_rx_vuejs_form_user_login_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
   //
 }
 
@@ -20,7 +19,11 @@ function login_rx_vuejs_form_user_login_form_alter(&$form,
  *        $variables
  */
 function login_rx_vuejs_preprocess_page(&$variables) {
-  $keys = ['#sorted', '#theme_wrappers', '#region', 'attributes'
+  $keys = [
+    '#sorted',
+    '#theme_wrappers',
+    '#region',
+    'attributes'
   ];
   $route_name = \Drupal::routeMatch()->getRouteName();
   // dump( $route_name );
@@ -79,9 +82,12 @@ function login_rx_vuejs_preprocess_page(&$variables) {
  */
 function login_rx_vuejs_theme($existing, $type, $theme, $path) {
   return [
-    'login_rx_vuejs' => ['render element' => 'element',
-      'preprocess functions' => ['template_preprocess_ogin_rx_vuejs'
-      ], 'file' => 'login_rx_vuejs.theme.inc'
+    'login_rx_vuejs' => [
+      'render element' => 'element',
+      'preprocess functions' => [
+        'template_preprocess_ogin_rx_vuejs'
+      ],
+      'file' => 'login_rx_vuejs.theme.inc'
     ]
   ];
 }
