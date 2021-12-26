@@ -30,7 +30,7 @@ class loginRxVuejsSubscriber implements EventSubscriberInterface {
 	 * Set header 'Content-Security-Policy' to response to allow embedding in iFrame.
 	 */
 	public function setHeaderContentSecurityPolicy(FilterResponseEvent $event){
-		// dump($event->getRequest()->headers->keys());
+	
 		$response = $event->getResponse();
 		// $response->headers->remove( 'X-Frame-Options' );
 		// permet de bloquer les popups avec les liens externes.

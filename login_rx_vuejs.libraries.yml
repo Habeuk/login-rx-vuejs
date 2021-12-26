@@ -58,3 +58,14 @@ login_register:
     - core/drupalSettings
 
 
+login_register_small:
+  js:
+    files-small/loginRxVuejs.umd.js: {preprocess: false}
+  css:
+    component:
+      files-small/loginRxVuejs.css: {preprocess: false}
+  dependencies:    
+    - login_rx_vuejs/vuejs_dev
+    - core/drupalSettings
+
+
