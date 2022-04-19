@@ -51,7 +51,7 @@ vuejs_dev:
 # Gere toutes la connexion
 login_register:
   js:
-    files/loginRxVuejs.umd.js: { preprocess: false }
+    files/loginRxVuejs.umd.min.js: { preprocess: false }
   css:
     component:
       files/loginRxVuejs.css: { preprocess: false }
@@ -60,12 +60,25 @@ login_register:
     - core/drupalSettings
 
 # Gere uniquement la connexion Google.
+# function dans certains ( dans un formualire vuejs ).
+# ne fonctionne pas dans un formulaire AJAX.
 login_register_small:
   js:
-    files-small/loginRxVuejs.umd.js: { preprocess: false }
+    files-small/loginRxVuejs.umd.min.js: { preprocess: false }
   css:
     component:
       files-small/loginRxVuejs.css: { preprocess: false }
   dependencies:
-    - login_rx_vuejs/vuejs_prod
+    - login_rx_vuejs/vuejs_dev
+    - core/drupalSettings
+
+# Gere uniquement la connexion Google.
+# Renvoit un seul fichier.
+login_register_small_vuejs:
+  js:
+    files-small-one-file/loginRxVuejs.umd.min.js: { preprocess: false }
+  css:
+    component:
+      files-small-one-file/loginRxVuejs.css: { preprocess: false }
+  dependencies:
     - core/drupalSettings

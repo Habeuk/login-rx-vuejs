@@ -3163,7 +3163,13 @@ var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpac
 // Vue.use(BootstrapVue);
 // const loginRegister = [];
 
-var tag = "#appLoginRegister"; // function loadScript(src) {
+var tag = "appLoginRegister"; //on recupere la valeur de : action_after_login
+
+var action_after_login = "default";
+
+if (document.getElementById(tag).hasAttribute("action_after_login")) {
+  action_after_login = document.getElementById(tag).getAttribute("action_after_login");
+} // function loadScript(src) {
 //   return new Promise((resolv) => {
 //     var s = document.createElement("script");
 //     s.setAttribute("src", src);
@@ -3174,6 +3180,7 @@ var tag = "#appLoginRegister"; // function loadScript(src) {
 //     document.head.appendChild(s);
 //   });
 // }
+
 
 var loginRegister = function loginRegister() {
   return Promise.all(/* import() */[__webpack_require__.e(2), __webpack_require__.e(3)]).then(__webpack_require__.bind(null, "1182")).then(function (component) {
@@ -3192,10 +3199,12 @@ var loginRegister = function loginRegister() {
 new external_commonjs_vue_commonjs2_vue_root_Vue_default.a({
   render: function render(h) {
     return h("div", {}, [h(loginRegister, {
-      props: {}
+      props: {
+        action_after_login: action_after_login
+      }
     })]);
   }
-}).$mount(tag);
+}).$mount(document.getElementById(tag));
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib-no-default.js
 
 
