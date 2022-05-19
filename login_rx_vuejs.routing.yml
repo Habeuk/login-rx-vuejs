@@ -1,8 +1,8 @@
-login_rx_vuejs.example:
-  path: '/login-rx-vuejs/example'
+login_rx_vuejs.current_user:
+  path: '/login-rx-vuejs/current-user'
   defaults:
     _title: 'Example'
-    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::build'
+    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::currentUser'
   requirements:
     _permission: 'access content'
 
