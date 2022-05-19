@@ -18,12 +18,12 @@
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"a57b1af4-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App/components/loginRegister.vue?vue&type=template&id=44c34884&
-var loginRegistervue_type_template_id_44c34884_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('ValidationObserver',{ref:"formValidate",attrs:{"tag":"form"}},[_c('div',{staticClass:"login-page"},[(_vm.alertDisplay)?_c('div',{staticClass:"alert w-100",class:_vm.alertType,attrs:{"role":"alert"},domProps:{"innerHTML":_vm._s(_vm.alertText)}}):_vm._e(),(_vm.isBusy)?_c('div',{staticClass:"spinner-grow text-primary",staticStyle:{"width":"3rem","height":"3rem"},attrs:{"role":"status"}},[_c('span',{staticClass:"sr-only"},[_vm._v("Chargement ...")])]):_vm._e(),_c('transition',{attrs:{"name":"customslide"}},[_c('div',{staticClass:"block-center"},[_c(_vm.stepe,{tag:"component",attrs:{"urlLogo":_vm.urlLogo,"form":_vm.form,"formValidate":_vm.formValidate,"action_after_login":_vm.action_after_login},on:{"select-stepe":_vm.selectStepe}})],1)])],1),_c('div',{staticClass:"text-white politik-secur mx-auto text-center"},[_c('p',[_vm._v(" En vous inscrivant, vous acceptez nos "),_c('a',{attrs:{"href":"#"}},[_vm._v(" Conditions d'utilisation ")]),_vm._v(", de recevoir des emeils et des MAJ de LESROISDELARENO et vous reconnaissez avoir lu notre "),_c('a',{attrs:{"href":"#"}},[_vm._v(" Politique de confidentialité")])])])])}
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"a57b1af4-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App/components/loginRegister.vue?vue&type=template&id=75c71662&
+var loginRegistervue_type_template_id_75c71662_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('ValidationObserver',{ref:"formValidate",attrs:{"tag":"form"}},[_c('div',{staticClass:"login-page"},[(_vm.alertDisplay)?_c('div',{staticClass:"alert w-100",class:_vm.alertType,attrs:{"role":"alert"},domProps:{"innerHTML":_vm._s(_vm.alertText)}}):_vm._e(),(_vm.isBusy)?_c('div',{staticClass:"spinner-grow text-primary",staticStyle:{"width":"3rem","height":"3rem"},attrs:{"role":"status"}},[_c('span',{staticClass:"sr-only"},[_vm._v("Chargement ...")])]):_vm._e(),_c('transition',{attrs:{"name":"customslide"}},[_c('div',{staticClass:"block-center"},[_c(_vm.stepe,{tag:"component",attrs:{"urlLogo":_vm.urlLogo,"form":_vm.form,"formValidate":_vm.formValidate,"action_after_login":_vm.action_after_login},on:{"select-stepe":_vm.selectStepe}})],1)])],1),_c('div',{staticClass:"text-white politik-secur mx-auto text-center"},[_c('p',[_vm._v(" En vous inscrivant, vous acceptez nos "),_c('a',{attrs:{"href":"#"}},[_vm._v(" Conditions d'utilisation ")]),_vm._v(", de recevoir des emails et des MAJ de LESROISDELARENO et vous reconnaissez avoir lu notre "),_c('a',{attrs:{"href":"#"}},[_vm._v(" Politique de confidentialité")])])])])}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/App/components/loginRegister.vue?vue&type=template&id=44c34884&
+// CONCATENATED MODULE: ./src/App/components/loginRegister.vue?vue&type=template&id=75c71662&
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js
 var asyncToGenerator = __webpack_require__("1da1");
@@ -2042,6 +2042,7 @@ var register_component = Object(componentNormalizer["a" /* default */])(
 
 /* harmony default export */ var loginRegistervue_type_script_lang_js_ = ({
   props: {
+    // see config_for_all.AfterRedirect for more informations.
     action_after_login: {
       type: String,
       "default": "default"
@@ -2224,7 +2225,7 @@ var loginRegistervue_type_style_index_0_lang_scss_ = __webpack_require__("f073")
 
 var loginRegister_component = Object(componentNormalizer["a" /* default */])(
   components_loginRegistervue_type_script_lang_js_,
-  loginRegistervue_type_template_id_44c34884_render,
+  loginRegistervue_type_template_id_75c71662_render,
   staticRenderFns,
   false,
   null,
