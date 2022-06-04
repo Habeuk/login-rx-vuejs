@@ -40,10 +40,11 @@ class LoginRxVuejsController extends ControllerBase {
     $id = \Drupal::currentUser()->id();
     if ($id) {
       $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-      $serializer = \Drupal::service('serializer');
-      $data = $serializer->serialize($user, 'json', [
-        'plugin_id' => 'entity'
-      ]);
+      // $serializer = \Drupal::service('serializer');
+      // $data = $serializer->serialize($user, 'json', [
+      // 'plugin_id' => 'entity'
+      // ]);
+      $data = $user->toArray();
     }
     else {
       $data = $id;
@@ -61,9 +62,13 @@ class LoginRxVuejsController extends ControllerBase {
     $content = Json::decode($content);
     $password = !empty($content['password']) ? $content['password'][0]['value'] : null;
     $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
+    if (!$login) {
+      $login = $content['mail'][0]['value'];
+    }
+    
     try {
       $content = $this->UserAuth->authentification($login, $password);
-    } //
+    }
     catch (loginRxVuejsException $e) {
       $msg = $e->getMessage();
       $code = $e->getCode();

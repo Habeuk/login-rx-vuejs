@@ -8,7 +8,7 @@ use Drupal\user\Entity\User;
 /**
  *
  * @author stephane
- *
+ *        
  */
 class loginRxVuejs {
   protected $UserAuth;
@@ -37,14 +37,13 @@ class loginRxVuejs {
     if ($uid) {
       $user = User::load($uid);
       user_login_finalize($user);
-      $serializer = \Drupal::service('serializer');
-      $data = $serializer->serialize($user, 'json', ['plugin_id' => 'entity'
-      ]);
-      return $data;
+      // $serializer = \Drupal::service('serializer');
+      // $data = $serializer->serialize($user, 'json', ['plugin_id' => 'entity'
+      // ]);
+      return $user->toArray();
     }
     else
-      throw new loginRxVuejsException(
-          ' Votre login ou mot de passe est incorrect ', 408);
+      throw new loginRxVuejsException(' Votre login ou mot de passe est incorrect ', 408);
   }
   
   /**
@@ -55,16 +54,16 @@ class loginRxVuejs {
    */
   public function loadByMailOrLogin($mail) {
     // https://www.drupal.org/node/2214507
-    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(
-        ['mail' => $mail
-        ]);
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
+      'mail' => $mail
+    ]);
     if ($users) {
       return array_key_first($users);
     }
     //
-    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(
-        ['name' => $mail
-        ]);
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
+      'name' => $mail
+    ]);
     if ($users)
       return array_key_first($users);
     return FALSE;

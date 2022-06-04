@@ -285,6 +285,12 @@ var basicRequest = {
   baseUrl: null,
 
   /**
+   * Utiliser si le module supporte la traduction
+   * example : fr, en, ar ...
+   */
+  languageId: null,
+
+  /**
    * Permet de determiner, si nous sommes en local ou pas.
    * @public
    * @returns Booleans
@@ -303,6 +309,8 @@ var basicRequest = {
     var _this = this;
 
     return new Promise(function (resolv, reject) {
+      if (_this.languageId) url = "/" + _this.languageId + url;
+      console.log(" LanguageId : ", _this.languageId);
       var urlFinal = url.includes("://") ? url : _this.getBaseUrl() + url;
       InstAxios.post(urlFinal, datas, configs).then(function (reponse) {
         resolv({
@@ -346,6 +354,7 @@ var basicRequest = {
     var _this3 = this;
 
     return new Promise(function (resolv, reject) {
+      if (_this3.languageId) url = "/" + _this3.languageId + url;
       var urlFinal = url.includes("://") ? url : _this3.getBaseUrl() + url;
       InstAxios.get(urlFinal, configs).then(function (reponse) {
         resolv({
