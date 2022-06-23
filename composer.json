@@ -13,6 +13,7 @@
     "require": {
     	"drupal/mail_login": "^2.6",
     	"facebook/graph-sdk": "^5.7",
+    	"drupal/smtp": "^1.0",
     	"google/apiclient":"^2.11"
     }
 }
