@@ -94,12 +94,38 @@ class LoginRxVuejsController extends ControllerBase {
     $user->save();
     //
     $this->UserAuth->connectUser($user->id());
+    $this->sendMail($email, $password);
+    //
     return $this->reponse([
       'user' => $user->toArray(),
       'password' => $password,
       'config' => $config,
       'roles' => $roles
     ]);
+  }
+  
+  /**
+   *
+   * @param string $to
+   * @param string $password
+   */
+  protected function sendMail($to, $password) {
+    $mailManager = \Drupal::service('plugin.manager.mail');
+    $module = 'login_rx_vuejs';
+    $key = 'login_rx_vuejs_send_mail';
+    $params['message'] = ' <h2> Retrouvez ci-dessous vos paramettres d\'identification </h2> ';
+    $params['message'] .= '<p> login : <strong> ' . $to . ' </strong> </p>';
+    $params['message'] .= '<p> password : <strong> ' . $password . ' </strong> </p>';
+    $params['subject'] = ' Paramettres de connexion ';
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    $send = true;
+    $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+    if ($result['result'] != true) {
+      $message = t(' There was a problem sending your email notification to @email. ', array(
+        '@email' => $to
+      ));
+      $this->loggerFactory->addLogger($message);
+    }
   }
   
   /**

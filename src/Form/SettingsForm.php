@@ -60,6 +60,13 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t(' Utiliser les fichiers compresses. '),
       '#default_value' => $config->get('environ_run')
     ];
+    //
+    $form['send_mail'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t(" Envoit des paramettres d'identification à l'utilisateur "),
+      '#default_value' => $config->get('send_mail')
+    ];
+    //
     $form['add_roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t(' select roles '),
@@ -67,6 +74,7 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => !empty($config->get('add_roles')) ? $config->get('add_roles') : [],
       '#options' => $options
     ];
+    $this->custom_function_name();
     return parent::buildForm($form, $form_state);
   }
   
@@ -81,6 +89,30 @@ class SettingsForm extends ConfigFormBase {
     $config->set('add_roles', $form_state->getValue('add_roles'));
     $config->save();
     parent::submitForm($form, $form_state);
+  }
+  
+  function custom_function_name() {
+    $mailManager = \Drupal::service('plugin.manager.mail');
+    $module = 'login_rx_vuejs';
+    $key = 'login_rx_vuejs_send_mail'; // Replace with Your key
+    $to = 'kksasteph888@gmail.com';
+    $params['message'] = ' <h1> MAil </h1> <p> hummm test send mail</p> ';
+    $params['title'] = ' Send email ';
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    $send = true;
+    $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+    if ($result['result'] != true) {
+      $message = t('There was a problem sending your email notification to @email.', array(
+        '@email' => $to
+      ));
+      $this->messenger()->addError($message);
+    }
+    else {
+      $message = t('An email notification has been sent to @email ', array(
+        '@email' => $to
+      ));
+      $this->messenger()->addMessage($message);
+    }
   }
   
 }
