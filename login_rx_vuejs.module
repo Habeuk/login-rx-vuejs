@@ -29,6 +29,12 @@ function login_rx_vuejs_mail($key, &$message, $params) {
       $message['from'] = $conf['mail'];
       $message['subject'] = $params['subject'];
       $message['body'][] = $params['message'];
+      // Send html
+      if (!empty($message['headers']['Content-Type'])) {
+        $contentType = explode(";", $message['headers']['Content-Type']);
+        $contentType[0] = "text/html";
+        $message['headers']['Content-Type'] = implode(';', $contentType);
+      }
       break;
   }
 }
