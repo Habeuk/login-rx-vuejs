@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Drupal\login_rx_vuejs\Services\loginRxVuejs as UserAuth;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\login_rx_vuejs\Services\loginRxVuejsException;
+use Drupal\user\Entity\User;
 
 /**
  * Returns responses for Login rx vuejs routes.
@@ -50,6 +51,55 @@ class LoginRxVuejsController extends ControllerBase {
       $data = $id;
     }
     return $this->reponse($data);
+  }
+  
+  public function GenratePassword(Request $Request) {
+    $config = $this->config('login_rx_vuejs.settings')->getRawData();
+    $content = $Request->getContent();
+    $content = Json::decode($content);
+    $id = \Drupal::currentUser()->id();
+    if ($id) {
+      $user = User::load($id);
+      return $this->reponse($user->toArray());
+    }
+    $email = $content['mail'][0]['value'];
+    if (!\Drupal::service('email.validator')->isValid($email)) {
+      return $this->reponse($content, '400', "Email non valide");
+    }
+    /**
+     *
+     * @var \Drupal\Core\Password\DefaultPasswordGenerator $pass_manager
+     */
+    $pass_manager = \Drupal::service('password_generator');
+    $password = $pass_manager->generate(15);
+    $values = [
+      'mail' => $email,
+      'password' => $password,
+      'name' => $email,
+      'status' => 1
+    ];
+    $user = User::create($values);
+    $user->save();
+    //
+    $roles = [];
+    if (!empty($config['add_roles'])) {
+      foreach ($config['add_roles'] as $value) {
+        if ($value)
+          $roles[] = $value;
+      }
+      $user->set('roles', array_unique($roles));
+    }
+    // set password
+    $user->setPassword($password);
+    $user->save();
+    //
+    $this->UserAuth->connectUser($user->id());
+    return $this->reponse([
+      'user' => $user->toArray(),
+      'password' => $password,
+      'config' => $config,
+      'roles' => $roles
+    ]);
   }
   
   /**

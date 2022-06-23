@@ -58,6 +58,17 @@ login_register:
   dependencies:
     - login_rx_vuejs/vuejs_prod
     - core/drupalSettings
+    
+# Gere toutes la connexion
+login_register_dev:
+  js:
+    files/loginRxVuejs.umd.min.js: { preprocess: false }
+  css:
+    component:
+      files/loginRxVuejs.css: { preprocess: false }
+  dependencies:
+    - login_rx_vuejs/vuejs_dev
+    - core/drupalSettings
 
 # Gere uniquement la connexion Google.
 # function dans certains ( dans un formualire vuejs ).
