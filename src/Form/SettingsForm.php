@@ -97,7 +97,7 @@ class SettingsForm extends ConfigFormBase {
     $key = 'login_rx_vuejs_send_mail'; // Replace with Your key
     $to = 'kksasteph888@gmail.com';
     $params['message'] = ' <h1> MAil </h1> <p> hummm test send mail</p> ';
-    $params['title'] = ' Send email ';
+    $params['subject'] = ' Send email ';
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = true;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
