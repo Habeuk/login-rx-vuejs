@@ -74,7 +74,7 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => !empty($config->get('add_roles')) ? $config->get('add_roles') : [],
       '#options' => $options
     ];
-    $this->custom_function_name();
+    // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
   }
   
