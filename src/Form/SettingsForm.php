@@ -91,6 +91,9 @@ class SettingsForm extends ConfigFormBase {
     parent::submitForm($form, $form_state);
   }
   
+  /**
+   * --
+   */
   function custom_function_name() {
     $mailManager = \Drupal::service('plugin.manager.mail');
     $module = 'login_rx_vuejs';

@@ -45,15 +45,14 @@ function login_rx_vuejs_mail($key, &$message, $params) {
  *        $variables
  */
 function login_rx_vuejs_preprocess_page(&$variables) {
-  $keys = [
-    '#sorted',
-    '#theme_wrappers',
-    '#region',
-    'attributes'
-  ];
   $route_name = \Drupal::routeMatch()->getRouteName();
-  //
   if ($route_name == "user.login" || $route_name == "user.register") {
+    $keys = [
+      '#sorted',
+      '#theme_wrappers',
+      '#region',
+      'attributes'
+    ];
     if (isset($variables['page']['content'])) {
       $blocks = $variables['page']['content'];
       foreach ($blocks as $i => $value) {
