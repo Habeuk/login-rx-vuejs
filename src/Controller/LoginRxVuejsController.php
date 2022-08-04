@@ -124,7 +124,7 @@ class LoginRxVuejsController extends ControllerBase {
       $message = t(' There was a problem sending your email notification to @email. ', array(
         '@email' => $to
       ));
-      $this->loggerFactory->addLogger($message);
+      $this->getLogger('login_rx_vuejs')->alert($message);
     }
   }
   
