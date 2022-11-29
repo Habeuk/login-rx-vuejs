@@ -17,11 +17,11 @@ use Drupal\user\Entity\User;
  */
 class LoginRxVuejsController extends ControllerBase {
   protected $UserAuth;
-  
+
   public function __construct(UserAuth $UserAuth) {
     $this->UserAuth = $UserAuth;
   }
-  
+
   /**
    *
    * {@inheritdoc}
@@ -31,7 +31,7 @@ class LoginRxVuejsController extends ControllerBase {
     // $container->get('prestashop_rest_api.build_product_to_drupal'));
     return new static($container->get('login_rx_vuejs.identification'));
   }
-  
+
   /**
    *
    * {@inheritdoc}
@@ -52,7 +52,7 @@ class LoginRxVuejsController extends ControllerBase {
     }
     return $this->reponse($data);
   }
-  
+
   public function GenratePassword(Request $Request) {
     $config = $this->config('login_rx_vuejs.settings')->getRawData();
     $content = $Request->getContent();
@@ -103,7 +103,7 @@ class LoginRxVuejsController extends ControllerBase {
       'roles' => $roles
     ]);
   }
-  
+
   /**
    *
    * @param string $to
@@ -127,7 +127,7 @@ class LoginRxVuejsController extends ControllerBase {
       $this->getLogger('login_rx_vuejs')->alert($message);
     }
   }
-  
+
   /**
    * Connexion de l'utilisateur
    */
@@ -141,7 +141,7 @@ class LoginRxVuejsController extends ControllerBase {
     if (!$login) {
       $login = $content['mail'][0]['value'];
     }
-    
+
     try {
       $content = $this->UserAuth->authentification($login, $password);
     }
@@ -162,7 +162,7 @@ class LoginRxVuejsController extends ControllerBase {
     }
     return $this->reponse($content, $code, $msg);
   }
-  
+
   public function CheckUserStatus(Request $Request) {
     $content = Json::decode($Request->getContent());
     $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
@@ -174,7 +174,7 @@ class LoginRxVuejsController extends ControllerBase {
     }
     return $this->reponse($content, $code, $msg);
   }
-  
+
   /**
    *
    * @param array|string $configs
@@ -191,5 +191,5 @@ class LoginRxVuejsController extends ControllerBase {
     $reponse->setContent($configs);
     return $reponse;
   }
-  
+
 }
