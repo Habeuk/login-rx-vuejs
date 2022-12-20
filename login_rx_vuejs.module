@@ -1,6 +1,4 @@
 <?php
-use Drupal\Core\Mail\MailManagerInterface;
-use Drupal\Component\Utility\Html;
 use Stephane888\Debug\Repositories\ConfigDrupal;
 
 /**
@@ -46,7 +44,7 @@ function login_rx_vuejs_mail($key, &$message, $params) {
  */
 function login_rx_vuejs_preprocess_page(&$variables) {
   $route_name = \Drupal::routeMatch()->getRouteName();
-  if ($route_name == "user.login" || $route_name == "user.register") {
+  if (!$variables['logged_in'] && $route_name == "user.login" || $route_name == "user.register") {
     $keys = [
       '#sorted',
       '#theme_wrappers',
