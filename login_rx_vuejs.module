@@ -60,11 +60,13 @@ function login_rx_vuejs_preprocess_page(&$variables) {
           unset($variables['page']['content'][$i]);
         }
       }
-      $variables['page']['content']['login_rx_vuejs'] = [
-        '#theme' => "login_rx_vuejs"
-      ];
-      // get config.
+      // Get config.
       $config = \Drupal::config('login_rx_vuejs.settings')->getRawData();
+      $variables['page']['content']['login_rx_vuejs'] = [
+        '#theme' => "login_rx_vuejs",
+        '#config' => $config
+      ];
+      
       if (isset($config['environ_run']) && $config['environ_run']) {
         $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
       }
@@ -116,7 +118,7 @@ function login_rx_vuejs_theme($existing, $type, $theme, $path) {
     'login_rx_vuejs' => [
       'render element' => 'element',
       'preprocess functions' => [
-        'template_preprocess_ogin_rx_vuejs'
+        'template_preprocess_login_rx_vuejs'
       ],
       'file' => 'login_rx_vuejs.theme.inc'
     ]

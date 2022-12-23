@@ -74,6 +74,22 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => !empty($config->get('add_roles')) ? $config->get('add_roles') : [],
       '#options' => $options
     ];
+    // action_after_login
+    $form['action_after_login'] = [
+      '#type' => 'radios',
+      '#title' => $this->t(' Action apres connection'),
+      '#default_value' => !empty($config->get('action_after_login')) ? $config->get('action_after_login') : '',
+      '#options' => [
+        'home' => "Redirection sur la page d'accueil",
+        "reload" => "Recharge la meme page",
+        "redirect" => "Redirection vers une page specifique(pas encore developper au niveau js)"
+      ]
+    ];
+    $form['url_redirect'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t(' Url to redirect after login '),
+      '#default_value' => !empty($config->get('url_redirect')) ? $config->get('url_redirect') : ''
+    ];
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
   }
@@ -87,6 +103,8 @@ class SettingsForm extends ConfigFormBase {
     $config->set('generate_user', $form_state->getValue('generate_user'));
     $config->set('environ_run', $form_state->getValue('environ_run'));
     $config->set('add_roles', $form_state->getValue('add_roles'));
+    $config->set('url_redirect', $form_state->getValue('url_redirect'));
+    $config->set('action_after_login', $form_state->getValue('action_after_login'));
     $config->save();
     parent::submitForm($form, $form_state);
   }
