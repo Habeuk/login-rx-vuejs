@@ -3,25 +3,24 @@
 namespace Drupal\login_rx_vuejs\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Drupal\Component\Serialization\Json;
 use Symfony\Component\HttpFoundation\Request;
-// use Drupal\mail_login\AuthDecorator as UserAuth;
 use Drupal\login_rx_vuejs\Services\loginRxVuejs as UserAuth;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\login_rx_vuejs\Services\loginRxVuejsException;
 use Drupal\user\Entity\User;
+use Stephane888\DrupalUtility\HttpResponse;
 
 /**
  * Returns responses for Login rx vuejs routes.
  */
 class LoginRxVuejsController extends ControllerBase {
   protected $UserAuth;
-
+  
   public function __construct(UserAuth $UserAuth) {
     $this->UserAuth = $UserAuth;
   }
-
+  
   /**
    *
    * {@inheritdoc}
@@ -31,7 +30,7 @@ class LoginRxVuejsController extends ControllerBase {
     // $container->get('prestashop_rest_api.build_product_to_drupal'));
     return new static($container->get('login_rx_vuejs.identification'));
   }
-
+  
   /**
    *
    * {@inheritdoc}
@@ -50,9 +49,9 @@ class LoginRxVuejsController extends ControllerBase {
     else {
       $data = $id;
     }
-    return $this->reponse($data);
+    return HttpResponse::response($data);
   }
-
+  
   public function GenratePassword(Request $Request) {
     $config = $this->config('login_rx_vuejs.settings')->getRawData();
     $content = $Request->getContent();
@@ -60,11 +59,11 @@ class LoginRxVuejsController extends ControllerBase {
     $id = \Drupal::currentUser()->id();
     if ($id) {
       $user = User::load($id);
-      return $this->reponse($user->toArray());
+      return HttpResponse::response($user->toArray());
     }
     $email = $content['mail'][0]['value'];
     if (!\Drupal::service('email.validator')->isValid($email)) {
-      return $this->reponse($content, '400', "Email non valide");
+      return HttpResponse::response($content, '400', "Email non valide");
     }
     /**
      *
@@ -96,14 +95,14 @@ class LoginRxVuejsController extends ControllerBase {
     $this->UserAuth->connectUser($user->id());
     $this->sendMail($email, $password);
     //
-    return $this->reponse([
+    return HttpResponse::response([
       'user' => $user->toArray(),
       'password' => $password,
       'config' => $config,
       'roles' => $roles
     ]);
   }
-
+  
   /**
    *
    * @param string $to
@@ -127,7 +126,7 @@ class LoginRxVuejsController extends ControllerBase {
       $this->getLogger('login_rx_vuejs')->alert($message);
     }
   }
-
+  
   /**
    * Connexion de l'utilisateur
    */
@@ -141,7 +140,7 @@ class LoginRxVuejsController extends ControllerBase {
     if (!$login) {
       $login = $content['mail'][0]['value'];
     }
-
+    
     try {
       $content = $this->UserAuth->authentification($login, $password);
     }
@@ -160,9 +159,9 @@ class LoginRxVuejsController extends ControllerBase {
       $code = $e->getCode();
       $content["Error"] = $e->getTrace();
     }
-    return $this->reponse($content, $code, $msg);
+    return HttpResponse::response($content, $code, $msg);
   }
-
+  
   public function CheckUserStatus(Request $Request) {
     $content = Json::decode($Request->getContent());
     $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
@@ -172,24 +171,7 @@ class LoginRxVuejsController extends ControllerBase {
     if ($login) {
       $content = $this->UserAuth->loadByMailOrLogin($login);
     }
-    return $this->reponse($content, $code, $msg);
+    return HttpResponse::response($content, $code, $msg);
   }
-
-  /**
-   *
-   * @param array|string $configs
-   * @param number $code
-   * @param string $message
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   */
-  protected function reponse($configs, $code = null, $message = null) {
-    if (!is_string($configs))
-      $configs = Json::encode($configs);
-    $reponse = new JsonResponse();
-    if ($code)
-      $reponse->setStatusCode($code, $message);
-    $reponse->setContent($configs);
-    return $reponse;
-  }
-
+  
 }
