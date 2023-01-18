@@ -48,37 +48,37 @@ class SettingsForm extends ConfigFormBase {
         $options[$k] = $role->label();
     }
     
-    $config = $this->config('login_rx_vuejs.settings');
+    $config = $this->config('login_rx_vuejs.settings')->getRawData();
     $form['generate_user'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Genere le mot de passe '),
       '#description' => "Genere le mot de passe et envoit le à l'email fournit",
-      '#default_value' => $config->get('generate_user')
+      '#default_value' => isset($config['generate_user']) ? $config['generate_user'] : false
     ];
     $form['environ_run'] = [
       '#type' => 'checkbox',
       '#title' => $this->t(' Utiliser les fichiers compresses. '),
-      '#default_value' => $config->get('environ_run')
+      '#default_value' => isset($config['environ_run']) ? $config['environ_run'] : true
     ];
     //
     $form['send_mail'] = [
       '#type' => 'checkbox',
       '#title' => $this->t(" Envoit des paramettres d'identification à l'utilisateur "),
-      '#default_value' => $config->get('send_mail')
+      '#default_value' => isset($config['send_mail']) ? $config['send_mail'] : false
     ];
     //
     $form['add_roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t(' select roles '),
       '#description' => " Ces roles seront automatiquement ajouté lors de la creation de compte ",
-      '#default_value' => !empty($config->get('add_roles')) ? $config->get('add_roles') : [],
+      '#default_value' => !empty($config['add_roles']) ? $config['add_roles'] : [],
       '#options' => $options
     ];
     // action_after_login
     $form['action_after_login'] = [
       '#type' => 'radios',
       '#title' => $this->t(' Action apres connection'),
-      '#default_value' => !empty($config->get('action_after_login')) ? $config->get('action_after_login') : '',
+      '#default_value' => !empty($config['action_after_login']) ? $config['action_after_login'] : '',
       '#options' => [
         'home' => "Redirection sur la page d'accueil",
         "reload" => "Recharge la meme page",
@@ -88,7 +88,63 @@ class SettingsForm extends ConfigFormBase {
     $form['url_redirect'] = [
       '#type' => 'textfield',
       '#title' => $this->t(' Url to redirect after login '),
-      '#default_value' => !empty($config->get('url_redirect')) ? $config->get('url_redirect') : ''
+      '#default_value' => !empty($config['url_redirect']) ? $config['url_redirect'] : ''
+    ];
+    $form['texts'] = [
+      '#type' => 'fieldset',
+      '#title' => "text utilisé au niveau du front",
+      '#tree' => TRUE
+    ];
+    $form['texts']['log_email'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['log_email']) ? $config['texts']['log_email'] : "Email ou Nom d'utilisateur"
+    ];
+    $form['texts']['pass'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['pass']) ? $config['texts']['pass'] : 'Mot de passe'
+    ];
+    $form['texts']['login'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['login']) ? $config['texts']['login'] : "Nom d'utilisateur"
+    ];
+    $form['texts']['mail'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['mail']) ? $config['texts']['mail'] : "Label email ou identifiant"
+    ];
+    $form['texts']['submit'] = [
+      '#type' => 'fieldset',
+      '#title' => "textes pour les boutons",
+      '#tree' => TRUE
+    ];
+    $form['texts']['submit']['first'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['submit']['first']) ? $config['texts']['submit']['first'] : "Suivant"
+    ];
+    $form['texts']['submit']['connect'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['submit']['connect']) ? $config['texts']['submit']['connect'] : "Connexion"
+    ];
+    $form['texts']['submit']['register'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['submit']['register']) ? $config['texts']['submit']['register'] : "S'inscrire"
+    ];
+    $form['texts']['submit']['final'] = [
+      "#type" => 'textfield',
+      '#title' => 'Label email ou identifiant',
+      '#default_value' => isset($config['texts']['submit']['final']) ? $config['texts']['submit']['final'] : "Terminée"
+    ];
+    $form['texts']['devis_create_user'] = [
+      "#type" => 'text_format',
+      '#title' => 'texte à afficher apres la creation du compte',
+      '#format' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
+      '#default_value' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
     ];
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
@@ -105,6 +161,7 @@ class SettingsForm extends ConfigFormBase {
     $config->set('add_roles', $form_state->getValue('add_roles'));
     $config->set('url_redirect', $form_state->getValue('url_redirect'));
     $config->set('action_after_login', $form_state->getValue('action_after_login'));
+    $config->set('texts', $form_state->getValue('texts'));
     $config->save();
     parent::submitForm($form, $form_state);
   }

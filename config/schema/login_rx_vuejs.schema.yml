@@ -1,0 +1,17 @@
+# Schema for the configuration files of the booking_system module.
+login_rx_vuejs.settings:
+  type: config_object
+  label: 'login_rx_vuejs settings'
+  mapping:
+    generate_user:
+      type: boolean
+      label: 'Genere le mot de passe'
+    send_mail:
+      type: boolean
+      label: "Envoit des paramettres d'identification à l'utilisateur"
+    add_roles:
+      type: config_object
+      label: 'select roles'
+    texts:
+      type: config_object
+      label: 'textes'
