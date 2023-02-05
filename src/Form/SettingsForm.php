@@ -57,7 +57,7 @@ class SettingsForm extends ConfigFormBase {
     ];
     $form['environ_run'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t(' Utiliser les fichiers compresses. '),
+      '#title' => $this->t(' Utiliser les fichiers compresses.( prod and dev) '),
       '#default_value' => isset($config['environ_run']) ? $config['environ_run'] : true
     ];
     //
@@ -145,6 +145,12 @@ class SettingsForm extends ConfigFormBase {
       '#title' => 'texte à afficher apres la creation du compte',
       '#format' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
       '#default_value' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
+    ];
+    $form['texts']['condition_utilisation'] = [
+      "#type" => 'text_format',
+      '#title' => 'Condition utilisation',
+      '#format' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
+      '#default_value' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
     ];
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);

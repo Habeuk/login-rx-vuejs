@@ -22,6 +22,15 @@ login_rx_vuejs.check_user_status:
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::CheckUserStatus'
   requirements:
     _permission: 'access content'
+    
+#recupere la configuration'
+login_rx_vuejs.get_configs:
+  path: '/login-rx-vuejs/get-configs'
+  defaults:
+    _title: 'Example'
+    _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::getConfigs'
+  requirements:
+    _permission: 'access content'
 
 #essaie de connecter l'utilisateur avec son login/email et son motdepass
 login_rx_vuejs.user_connexion:
