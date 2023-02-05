@@ -1,7 +1,7 @@
 "use strict";
-((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[757],{
+((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[81],{
 
-/***/ 3757:
+/***/ 81:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -1182,9 +1182,9 @@ window.fbAsyncInit = function () {
 /**/
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
 var modules_es_function_name = __webpack_require__(8309);
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/CheckStatus.vue?vue&type=template&id=fe4e8f42&
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/CheckStatus.vue?vue&type=template&id=de5230d8&
 
-var CheckStatusvue_type_template_id_fe4e8f42_render = function render() {
+var CheckStatusvue_type_template_id_de5230d8_render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c('div', {
@@ -1206,7 +1206,8 @@ var CheckStatusvue_type_template_id_fe4e8f42_render = function render() {
     staticClass: "content-center__btn-column"
   }, [_c('logingoogle', {
     attrs: {
-      "idHtml": "default"
+      "idHtml": "default",
+      "action-after-login": _vm.actionAfterLogin
     }
   }), _c('div', {
     staticClass: "btn-login btn-login--facebook",
@@ -1275,9 +1276,9 @@ var CheckStatusvue_type_template_id_fe4e8f42_render = function render() {
     staticClass: "btn-login__text"
   }, [_vm._v(" " + _vm._s(_vm.messages.submit.first) + " ")]), _vm.waiting === 'wait' ? _c('svgWaiting') : _vm._e()], 1)])]);
 };
-var CheckStatusvue_type_template_id_fe4e8f42_staticRenderFns = [];
+var CheckStatusvue_type_template_id_de5230d8_staticRenderFns = [];
 
-;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=template&id=fe4e8f42&
+;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=template&id=de5230d8&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.iterator.js
 var es_array_iterator = __webpack_require__(6992);
@@ -1285,8 +1286,8 @@ var es_array_iterator = __webpack_require__(6992);
 var es_string_iterator = __webpack_require__(8783);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-collections.iterator.js
 var web_dom_collections_iterator = __webpack_require__(3948);
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=template&id=8e59a1be&
-var LoginGooglevue_type_template_id_8e59a1be_render = function render() {
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=template&id=10b0f5ec&
+var LoginGooglevue_type_template_id_10b0f5ec_render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c('div', {
@@ -1298,7 +1299,7 @@ var LoginGooglevue_type_template_id_8e59a1be_render = function render() {
     }
   });
 };
-var LoginGooglevue_type_template_id_8e59a1be_staticRenderFns = [];
+var LoginGooglevue_type_template_id_10b0f5ec_staticRenderFns = [];
 
 ;// CONCATENATED MODULE: ./src/App/rx/google.js
 //const gapi = window.gapi;
@@ -1347,7 +1348,7 @@ function loadScript(src) {
     },
     actionAfterLogin: {
       type: String,
-      "default": "default"
+      required: true
     }
   },
   computed: (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, (0,vuex_esm/* mapState */.rn)(["configs_login_rx_vuejs"])), {}, {
@@ -1440,10 +1441,10 @@ function loadScript(src) {
 });
 ;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=script&lang=js&
  /* harmony default export */ const components_LoginGooglevue_type_script_lang_js_ = (LoginGooglevue_type_script_lang_js_); 
-;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=8e59a1be&prod&lang=scss&
+;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=10b0f5ec&prod&lang=scss&
 // extracted by mini-css-extract-plugin
 
-;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=8e59a1be&prod&lang=scss&
+;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=10b0f5ec&prod&lang=scss&
 
 ;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue
 
@@ -1456,8 +1457,8 @@ function loadScript(src) {
 
 var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
   components_LoginGooglevue_type_script_lang_js_,
-  LoginGooglevue_type_template_id_8e59a1be_render,
-  LoginGooglevue_type_template_id_8e59a1be_staticRenderFns,
+  LoginGooglevue_type_template_id_10b0f5ec_render,
+  LoginGooglevue_type_template_id_10b0f5ec_staticRenderFns,
   false,
   null,
   null,
@@ -1556,8 +1557,8 @@ var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
 ;
 var CheckStatus_component = (0,componentNormalizer/* default */.Z)(
   components_CheckStatusvue_type_script_lang_js_,
-  CheckStatusvue_type_template_id_fe4e8f42_render,
-  CheckStatusvue_type_template_id_fe4e8f42_staticRenderFns,
+  CheckStatusvue_type_template_id_de5230d8_render,
+  CheckStatusvue_type_template_id_de5230d8_staticRenderFns,
   false,
   null,
   null,
@@ -2617,4 +2618,4 @@ var LoginRegister_component = (0,componentNormalizer/* default */.Z)(
 /***/ })
 
 }]);
-//# sourceMappingURL=loginRxVuejs.common.757.js.map
+//# sourceMappingURL=loginRxVuejs.common.81.js.map
