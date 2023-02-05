@@ -71,6 +71,11 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t(" Google client id "),
       '#default_value' => isset($config['client_google_id']) ? $config['client_google_id'] : ''
     ];
+    $form['facebook_app_id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t(" Facebook App Id"),
+      '#default_value' => isset($config['facebook_app_id']) ? $config['facebook_app_id'] : ''
+    ];
     //
     $form['add_roles'] = [
       '#type' => 'checkboxes',
@@ -174,6 +179,7 @@ class SettingsForm extends ConfigFormBase {
     $config->set('action_after_login', $form_state->getValue('action_after_login'));
     $config->set('texts', $form_state->getValue('texts'));
     $config->set('client_google_id', $form_state->getValue('client_google_id'));
+    $config->set('facebook_app_id', $form_state->getValue('facebook_app_id'));
     $config->save();
     parent::submitForm($form, $form_state);
   }
