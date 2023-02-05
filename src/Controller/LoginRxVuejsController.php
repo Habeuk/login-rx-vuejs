@@ -66,6 +66,8 @@ class LoginRxVuejsController extends ControllerBase {
     if (!\Drupal::service('email.validator')->isValid($email)) {
       return HttpResponse::response($content, '400', "Email non valide");
     }
+    // on doit renvoyer ce processus dans un service (car on a le meme
+    // code deux foix ).
     /**
      *
      * @var \Drupal\Core\Password\DefaultPasswordGenerator $pass_manager
