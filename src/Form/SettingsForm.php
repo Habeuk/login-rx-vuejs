@@ -65,6 +65,11 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t(" Envoit des paramettres d'identification à l'utilisateur "),
       '#default_value' => isset($config['send_mail']) ? $config['send_mail'] : false
+    ]; //
+    $form['client_google_id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t(" Google client id "),
+      '#default_value' => isset($config['client_google_id']) ? $config['client_google_id'] : ''
     ];
     //
     $form['add_roles'] = [
@@ -168,6 +173,7 @@ class SettingsForm extends ConfigFormBase {
     $config->set('url_redirect', $form_state->getValue('url_redirect'));
     $config->set('action_after_login', $form_state->getValue('action_after_login'));
     $config->set('texts', $form_state->getValue('texts'));
+    $config->set('client_google_id', $form_state->getValue('client_google_id'));
     $config->save();
     parent::submitForm($form, $form_state);
   }
