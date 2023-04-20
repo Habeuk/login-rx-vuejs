@@ -1,0 +1,19 @@
+langcode: 'en'
+generate_user: false
+environ_run: true
+send_mail: false
+action_after_login: 'home'
+texts:
+  log_email: "Email or Username"
+  pass: "Password"
+  login: "Username"
+  mail: "Email label or identifier"
+  devis_create_user: "Your account has been created <br> <strong> Please check your mailbox to validate your account </strong>"
+  condition_utilisation: 'By signing up, you agree to our <a href="#">Terms of Service</a> and acknowledge that you have read our <a href="#">Privacy Policy</a>'
+  submit:
+    first: "Next"
+    connect: "Login"
+    register: "register"
+    final: "Completed"
+    
+  

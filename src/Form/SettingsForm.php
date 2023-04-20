@@ -51,19 +51,19 @@ class SettingsForm extends ConfigFormBase {
     $config = $this->config('login_rx_vuejs.settings')->getRawData();
     $form['generate_user'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Genere le mot de passe '),
+      '#title' => $this->t('Generate the password'),
       '#description' => "Genere le mot de passe et envoit le à l'email fournit",
       '#default_value' => isset($config['generate_user']) ? $config['generate_user'] : false
     ];
     $form['environ_run'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t(' Utiliser les fichiers compresses.( prod and dev) '),
+      '#title' => $this->t(' Use compressed files.( prod and dev)'),
       '#default_value' => isset($config['environ_run']) ? $config['environ_run'] : true
     ];
     //
     $form['send_mail'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t(" Envoit des paramettres d'identification à l'utilisateur "),
+      '#title' => $this->t(" Send credentials to user "),
       '#default_value' => isset($config['send_mail']) ? $config['send_mail'] : false
     ]; //
     $form['client_google_id'] = [
@@ -87,12 +87,12 @@ class SettingsForm extends ConfigFormBase {
     // action_after_login
     $form['action_after_login'] = [
       '#type' => 'radios',
-      '#title' => $this->t(' Action apres connection'),
+      '#title' => $this->t(' Action after connection '),
       '#default_value' => !empty($config['action_after_login']) ? $config['action_after_login'] : '',
       '#options' => [
-        'home' => "Redirection sur la page d'accueil",
-        "reload" => "Recharge la meme page",
-        "redirect" => "Redirection vers une page specifique(pas encore developper au niveau js)"
+        'home' => $this->t(" Redirection on the home page "),
+        "reload" => $this->t(" Reload the same page "),
+        "redirect" => $this->t(" Redirection to a specific page (not yet developed at js level) ")
       ]
     ];
     $form['url_redirect'] = [
@@ -102,22 +102,22 @@ class SettingsForm extends ConfigFormBase {
     ];
     $form['texts'] = [
       '#type' => 'fieldset',
-      '#title' => "text utilisé au niveau du front",
+      '#title' => $this->t("text utilisé au niveau du front"),
       '#tree' => TRUE
     ];
     $form['texts']['log_email'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('login label'),
       '#default_value' => isset($config['texts']['log_email']) ? $config['texts']['log_email'] : "Email ou Nom d'utilisateur"
     ];
     $form['texts']['pass'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('password label'),
       '#default_value' => isset($config['texts']['pass']) ? $config['texts']['pass'] : 'Mot de passe'
     ];
     $form['texts']['login'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('login label (register)'),
       '#default_value' => isset($config['texts']['login']) ? $config['texts']['login'] : "Nom d'utilisateur"
     ];
     $form['texts']['mail'] = [
@@ -132,7 +132,7 @@ class SettingsForm extends ConfigFormBase {
     ];
     $form['texts']['submit']['first'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('next label'),
       '#default_value' => isset($config['texts']['submit']['first']) ? $config['texts']['submit']['first'] : "Suivant"
     ];
     $form['texts']['submit']['connect'] = [
@@ -142,23 +142,23 @@ class SettingsForm extends ConfigFormBase {
     ];
     $form['texts']['submit']['register'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('Label register'),
       '#default_value' => isset($config['texts']['submit']['register']) ? $config['texts']['submit']['register'] : "S'inscrire"
     ];
     $form['texts']['submit']['final'] = [
       "#type" => 'textfield',
-      '#title' => 'Label email ou identifiant',
+      '#title' => $this->t('Label completed'),
       '#default_value' => isset($config['texts']['submit']['final']) ? $config['texts']['submit']['final'] : "Terminée"
     ];
     $form['texts']['devis_create_user'] = [
       "#type" => 'text_format',
-      '#title' => 'texte à afficher apres la creation du compte',
+      '#title' => $this->t('text to display after account creation'),
       '#format' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
       '#default_value' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
     ];
     $form['texts']['condition_utilisation'] = [
       "#type" => 'text_format',
-      '#title' => 'Condition utilisation',
+      '#title' => $this->t('Text condition of use'),
       '#format' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
       '#default_value' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
     ];
