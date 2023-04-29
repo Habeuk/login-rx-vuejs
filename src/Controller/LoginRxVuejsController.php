@@ -143,6 +143,7 @@ class LoginRxVuejsController extends ControllerBase {
         $login = $content['mail'][0]['value'];
       }
       $content = $this->UserAuth->authentification($login, $password);
+      return HttpResponse::response($content);
     }
     catch (loginRxVuejsException $e) {
       $content['message'] = $e->getMessage();
