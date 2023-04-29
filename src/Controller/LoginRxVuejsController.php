@@ -134,35 +134,34 @@ class LoginRxVuejsController extends ControllerBase {
    * Connexion de l'utilisateur
    */
   public function userConnexion(Request $Request) {
-    $code = 200;
-    $msg = "";
-    $content = $Request->getContent();
-    $content = Json::decode($content);
-    $password = !empty($content['pass']) ? $content['pass'][0]['value'] : null;
-    $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
-    if (!$login) {
-      $login = $content['mail'][0]['value'];
-    }
-    
     try {
+      $content = $Request->getContent();
+      $content = Json::decode($content);
+      $password = !empty($content['pass']) ? $content['pass'][0]['value'] : null;
+      $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
+      if (!$login) {
+        $login = $content['mail'][0]['value'];
+      }
       $content = $this->UserAuth->authentification($login, $password);
     }
     catch (loginRxVuejsException $e) {
-      $msg = $e->getMessage();
-      $code = $e->getCode();
+      $content['message'] = $e->getMessage();
+      $content['code'] = $e->getCode();
       $content["loginRxVuejsException"] = $e->getTrace();
+      return HttpResponse::response($content, $content['code'], $content['message']);
     } //
     catch (\Exception $e) {
-      $msg = $e->getMessage();
-      $code = $e->getCode();
+      $content['message'] = $e->getMessage();
+      $content['code'] = $e->getCode();
       $content["Exception"] = $e->getTrace();
+      return HttpResponse::response($content, $content['code'], $content['message']);
     } //
     catch (\Error $e) {
-      $msg = $e->getMessage();
-      $code = $e->getCode();
+      $content['message'] = $e->getMessage();
+      $content['code'] = $e->getCode();
       $content["Error"] = $e->getTrace();
+      return HttpResponse::response($content, $content['code'], $content['message']);
     }
-    return HttpResponse::response($content, $code, $msg);
   }
   
   /**
