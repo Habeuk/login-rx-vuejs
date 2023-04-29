@@ -137,7 +137,13 @@ class LoginRxVuejsController extends ControllerBase {
     try {
       $content = $Request->getContent();
       $content = Json::decode($content);
-      $password = !empty($content['pass']) ? $content['pass'][0]['value'] : null;
+      $password = null;
+      if (!empty($content['pass']))
+        $password = $content['pass'][0]['value'];
+      // @deprecated, dont use this. @use ['pass']
+      elseif (!empty($content['password']))
+        $password = !empty($content['password']) ? $content['password'][0]['value'] : null;
+      
       $login = !empty($content['name']) ? $content['name'][0]['value'] : null;
       if (!$login) {
         $login = $content['mail'][0]['value'];
