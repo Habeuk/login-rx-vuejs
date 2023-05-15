@@ -1,7 +1,7 @@
 "use strict";
-((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[367],{
+((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[987],{
 
-/***/ 367:
+/***/ 9987:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -12,7 +12,7 @@ __webpack_require__.d(__webpack_exports__, {
   "default": () => (/* binding */ LoginRegister)
 });
 
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=template&id=535fcc02&
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=template&id=067c139e&
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
@@ -70,7 +70,7 @@ var render = function render() {
   })], 1)])], 1), _c('div', {
     staticClass: "politik-secur mx-auto text-center"
   }, [_vm._t("condition_utilisation", function () {
-    return [_vm.configs_login_rx_vuejs.texts && _vm.configs_login_rx_vuejs.texts.condition_utilisation ? _c('div', {
+    return [_vm.configs_login_rx_vuejs && _vm.configs_login_rx_vuejs.texts && _vm.configs_login_rx_vuejs.texts.condition_utilisation ? _c('div', {
       domProps: {
         "innerHTML": _vm._s(_vm.configs_login_rx_vuejs.texts.condition_utilisation.value)
       }
@@ -391,6 +391,13 @@ var basicRequest = {
   getBaseUrl: function getBaseUrl() {
     if (this.baseUrl) return this.isLocalDev && this.TestDomain ? this.TestDomain.trim("/") : this.baseUrl;else return this.isLocalDev && this.TestDomain ? this.TestDomain.trim("/") : window.location.protocol + "//" + window.location.host;
   },
+  /**
+   * Permet de recuperer les messages , en priorité celui definie dans headers.customstatustext.
+   *
+   * @param {*} er
+   * @param {*} type ( vrai pour recuperer les messages en cas de success )
+   * @returns
+   */
   getStatusText: function getStatusText(er) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     if (er) {
@@ -570,7 +577,8 @@ var AjaxToastBootStrap = (0,objectSpread2/* default */.Z)((0,objectSpread2/* def
     }
     return new Promise(function (resolv, reject) {
       _this.$bvModal.msgBoxConfirm(body, confDefault).then(function (value) {
-        if (value) resolv(value);else reject(value);
+        console.log("value : ", value);
+        resolv(value);
       })["catch"](function (err) {
         reject(err);
       });
@@ -578,13 +586,19 @@ var AjaxToastBootStrap = (0,objectSpread2/* default */.Z)((0,objectSpread2/* def
   },
   modalConfirmDelete: function modalConfirmDelete() {
     var body = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "Confirmer la suppression, NB : cette action est irreverssible.";
-    var conf = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    var newConf = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var conf = {
       title: "Attention",
       okVariant: "danger",
       okTitle: "Supprimer",
       cancelTitle: "Annuler",
-      footerClass: "p-2"
+      footerClass: "p-2",
+      headerBgVariant: "danger",
+      headerTextVariant: "light"
     };
+    for (var i in newConf) {
+      conf[i] = newConf[i];
+    }
     return this.modalMessage(body, conf);
   },
   modalSuccess: function modalSuccess() {
@@ -2592,10 +2606,10 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
 });
 ;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=script&lang=js&
  /* harmony default export */ const components_LoginRegistervue_type_script_lang_js_ = (LoginRegistervue_type_script_lang_js_); 
-;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=535fcc02&prod&lang=scss&
+;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=067c139e&prod&lang=scss&
 // extracted by mini-css-extract-plugin
 
-;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=535fcc02&prod&lang=scss&
+;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=067c139e&prod&lang=scss&
 
 ;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue
 
@@ -2622,4 +2636,4 @@ var LoginRegister_component = (0,componentNormalizer/* default */.Z)(
 /***/ })
 
 }]);
-//# sourceMappingURL=loginRxVuejs.common.367.js.map
+//# sourceMappingURL=loginRxVuejs.common.987.js.map
