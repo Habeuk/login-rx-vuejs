@@ -153,14 +153,14 @@ class SettingsForm extends ConfigFormBase {
     $form['texts']['devis_create_user'] = [
       "#type" => 'text_format',
       '#title' => $this->t('text to display after account creation'),
-      '#format' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
-      '#default_value' => !empty($config['texts']['devis_create_user']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
+      '#format' => !empty($config['texts']['devis_create_user']['format']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
+      '#default_value' => !empty($config['texts']['devis_create_user']['value']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
     ];
     $form['texts']['condition_utilisation'] = [
       "#type" => 'text_format',
       '#title' => $this->t('Text condition of use'),
-      '#format' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
-      '#default_value' => !empty($config['texts']['condition_utilisation']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
+      '#format' => !empty($config['texts']['condition_utilisation']['format']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
+      '#default_value' => !empty($config['texts']['condition_utilisation']['value']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
     ];
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
@@ -178,8 +178,8 @@ class SettingsForm extends ConfigFormBase {
     $config->set('url_redirect', $form_state->getValue('url_redirect'));
     $config->set('action_after_login', $form_state->getValue('action_after_login'));
     $config->set('texts', $form_state->getValue('texts'));
-    $config->set('client_google_id', $form_state->getValue('client_google_id'));
-    $config->set('facebook_app_id', $form_state->getValue('facebook_app_id'));
+    $config->set('client_google_id', trim($form_state->getValue('client_google_id')));
+    $config->set('facebook_app_id', trim($form_state->getValue('facebook_app_id')));
     $config->save();
     parent::submitForm($form, $form_state);
   }
