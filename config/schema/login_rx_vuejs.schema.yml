@@ -6,6 +6,9 @@ login_rx_vuejs.settings:
     generate_user:
       type: boolean
       label: 'Genere le mot de passe'
+    load_user_by_access_domain:
+      type: boolean
+      label: 'Genere le mot de passe'
     send_mail:
       type: boolean
       label: "Envoit des paramettres d'identification à l'utilisateur"

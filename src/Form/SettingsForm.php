@@ -49,6 +49,18 @@ class SettingsForm extends ConfigFormBase {
     }
     
     $config = $this->config('login_rx_vuejs.settings')->getRawData();
+    /**
+     * Si le module 'domain_access' est activée, on peut filtrer la connection
+     * via le domaine.
+     */
+    if (\Drupal::moduleHandler()->moduleExists('domain') && \Drupal::moduleHandler()->moduleExists('domain_access')) {
+      $form['load_user_by_access_domain'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t(" Activee la creation de compte par domaine "),
+        '#description' => "Permet de connecter les utilisateurs sur un ou plusieurs domaines",
+        '#default_value' => isset($config['load_user_by_access_domain']) ? $config['load_user_by_access_domain'] : false
+      ];
+    }
     $form['generate_user'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Generate the password'),
@@ -180,6 +192,9 @@ class SettingsForm extends ConfigFormBase {
     $config->set('texts', $form_state->getValue('texts'));
     $config->set('client_google_id', trim($form_state->getValue('client_google_id')));
     $config->set('facebook_app_id', trim($form_state->getValue('facebook_app_id')));
+    if (\Drupal::moduleHandler()->moduleExists('domain') && \Drupal::moduleHandler()->moduleExists('domain_access')) {
+      $config->set('load_user_by_access_domain', $form_state->getValue('load_user_by_access_domain'));
+    }
     $config->save();
     parent::submitForm($form, $form_state);
   }

@@ -1,5 +1,6 @@
 langcode: 'en'
 generate_user: false
+load_user_by_access_domain: false
 environ_run: true
 send_mail: false
 action_after_login: 'home'

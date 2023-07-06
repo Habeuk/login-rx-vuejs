@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\login_rx_vuejs\Services\loginRxVuejsException;
 use Drupal\user\Entity\User;
 use Stephane888\DrupalUtility\HttpResponse;
-use Stephane888\Debug\Repositories\ConfigDrupal;
 
 /**
  * Returns responses for Login rx vuejs routes.
@@ -194,8 +193,7 @@ class LoginRxVuejsController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    */
   public function getConfigs() {
-    $content = ConfigDrupal::config('login_rx_vuejs.settings');
-    return HttpResponse::response($content);
+    return HttpResponse::response($this->UserAuth->getConfigs());
   }
   
 }
