@@ -109,6 +109,13 @@ class loginRxVuejs {
        * @var array $users
        */
       $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
+        'name' => $mail
+        // $fieldAccess => $domain->id()
+      ]);
+      if ($users) {
+        return array_key_first($users);
+      }
+      $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
         'mail' => $mail
         // $fieldAccess => $domain->id()
       ]);
@@ -120,6 +127,12 @@ class loginRxVuejs {
     else {
       $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
         'name' => $mail
+      ]);
+      if ($users)
+        return array_key_first($users);
+      //
+      $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties([
+        'mail' => $mail
       ]);
       if ($users)
         return array_key_first($users);
