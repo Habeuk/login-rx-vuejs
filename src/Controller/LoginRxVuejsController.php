@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\login_rx_vuejs\Services\loginRxVuejsException;
 use Drupal\user\Entity\User;
 use Stephane888\DrupalUtility\HttpResponse;
+use Stephane888\Debug\Repositories\ConfigDrupal;
+use Symfony\Component\Mime\Header\MailboxHeader;
+use Symfony\Component\Mime\Address;
 
 /**
  * Returns responses for Login rx vuejs routes.
@@ -106,22 +109,50 @@ class LoginRxVuejsController extends ControllerBase {
   }
   
   /**
+   * Pour l'envoit de mail on charger le plugin.mail confiurer par defaut via le
+   * module MailSystem.
    *
    * @param string $to
    * @param string $password
    */
   protected function sendMail($to, $password) {
-    $mailManager = \Drupal::service('plugin.manager.mail');
-    $module = 'login_rx_vuejs';
+    $siteInfo = ConfigDrupal::config('system.site');
+    $mailSystem = ConfigDrupal::config('mailsystem.settings');
+    
+    /**
+     * On initialise le chargeur de plugin de mail.
+     *
+     * @var \Drupal\Core\Mail\MailManager $PluginMailManger
+     */
+    $PluginMailManger = \Drupal::service('plugin.manager.mail');
+    
+    /**
+     * On recupere l'instance à partir de l'id du plugin.
+     *
+     * @var \Drupal\Core\Mail\MailInterface $mailPlugin
+     */
+    $mailPlugin = $PluginMailManger->createInstance($mailSystem['defaults']['sender']);
+    // $module = 'login_rx_vuejs';
     $key = 'login_rx_vuejs_send_mail';
-    $params['message'] = ' <h2> Retrouvez ci-dessous vos paramettres d\'identification </h2> ';
-    $params['message'] .= '<p> login : <strong> ' . $to . ' </strong> </p>';
-    $params['message'] .= '<p> password : <strong> ' . $password . ' </strong> </p>';
-    $params['subject'] = ' Paramettres de connexion ';
-    $langcode = \Drupal::currentUser()->getPreferredLangcode();
-    $send = true;
-    $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
-    if ($result['result'] != true) {
+    $message = ' <h2> Retrouvez ci-dessous vos paramettres d\'identification </h2> ';
+    $message .= '<p> login : <strong> ' . $to . ' </strong> </p>';
+    $message .= '<p> password : <strong> ' . $password . ' </strong> </p>';
+    
+    $datas = [
+      'id' => $key,
+      'to' => $to,
+      'subject' => ' Paramettres de connexion ' . $siteInfo['name'],
+      'body' => $message,
+      'headers' => [
+        'From' => $siteInfo['mail'],
+        'Sender' => $siteInfo['mail'],
+        'Return-Path' => $siteInfo['mail']
+      ]
+    ];
+    $mailbox = new MailboxHeader('From', new Address($siteInfo['mail'], $siteInfo['name']));
+    $datas['headers']['From'] = $mailbox->getBodyAsString();
+    $result = $mailPlugin->mail($datas);
+    if (!$result) {
       $message = t(' There was a problem sending your email notification to @email. ', array(
         '@email' => $to
       ));
