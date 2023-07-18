@@ -195,6 +195,9 @@ class SettingsForm extends ConfigFormBase {
     if (\Drupal::moduleHandler()->moduleExists('domain') && \Drupal::moduleHandler()->moduleExists('domain_access')) {
       $config->set('load_user_by_access_domain', $form_state->getValue('load_user_by_access_domain'));
     }
+    else {
+      $config->set('load_user_by_access_domain', false);
+    }
     $config->save();
     parent::submitForm($form, $form_state);
   }
