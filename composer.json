@@ -12,8 +12,9 @@
     "minimum-stability": "dev",
     "require": {
     	"drupal/mail_login": "^2.6",
-    	"drupal/mailsystem": "^4.4",
+    	"drupal/mailsystem": "^4.4",    	
     	"google/apiclient":"^2.11",
+    	"drupal/apivuejs": "dev-1x|^1.0",
     	"stephane888/drupal_utility": "^1.0|dev-1x"
     }
 }
