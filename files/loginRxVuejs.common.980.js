@@ -1,7 +1,7 @@
 "use strict";
-((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[987],{
+((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[980],{
 
-/***/ 9987:
+/***/ 2980:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -12,7 +12,7 @@ __webpack_require__.d(__webpack_exports__, {
   "default": () => (/* binding */ LoginRegister)
 });
 
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=template&id=067c139e&
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=template&id=d0a84bc4&
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
@@ -62,10 +62,13 @@ var render = function render() {
       "show-password": _vm.showPassword,
       "action-after-register": _vm.actionAfterRegister,
       "show-modal-success": _vm.showModalSuccess,
-      "configs_login_rx_vuejs": _vm.configs_login_rx_vuejs
+      "configs_login_rx_vuejs": _vm.configs_login_rx_vuejs,
+      "show-register-link": _vm.showRegisterLink,
+      "readonly-name": _vm.readonlyName
     },
     on: {
-      "select-stepe": _vm.selectStepe
+      "select-stepe": _vm.selectStepe,
+      "go-register": _vm.goRegister
     }
   })], 1)])], 1), _c('div', {
     staticClass: "politik-secur mx-auto text-center"
@@ -889,10 +892,11 @@ if (typeof window !== "undefined" && window.Vue) {
     return stepe;
   }
 });
-;// CONCATENATED MODULE: ./src/config.js
+;// CONCATENATED MODULE: ./src/rootConfig.js
 
 
 var config = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, basic), {}, {
+  TestDomain: "http://habeuk.kksa",
   /**
    * Retoune un entier arleatoire entre [99-999]
    */
@@ -904,13 +908,13 @@ var config = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 });
-/* harmony default export */ const src_config = (config);
+/* harmony default export */ const rootConfig = (config);
 ;// CONCATENATED MODULE: ./src/App/session.js
 
 
 
 
-/* harmony default export */ const session = ((0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, src_config), {}, {
+/* harmony default export */ const session = ((0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, rootConfig), {}, {
   url_session: "/session/token",
   token: null,
   /**
@@ -935,7 +939,7 @@ var config = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({
 
 
 
-var utilities = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, session), src_config), {}, {
+var utilities = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, session), rootConfig), {}, {
   /**
    * configCustom[{name:"",value:""}]
    */
@@ -1196,9 +1200,9 @@ window.fbAsyncInit = function () {
 /**/
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
 var modules_es_function_name = __webpack_require__(8309);
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/CheckStatus.vue?vue&type=template&id=9507e462&
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/CheckStatus.vue?vue&type=template&id=30ff0345&
 
-var CheckStatusvue_type_template_id_9507e462_render = function render() {
+var CheckStatusvue_type_template_id_30ff0345_render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c('div', {
@@ -1288,11 +1292,24 @@ var CheckStatusvue_type_template_id_9507e462_render = function render() {
     }
   }, [_c('span', {
     staticClass: "btn-login__text"
-  }, [_vm._v(" " + _vm._s(_vm.messages.submit.first) + " ")]), _vm.waiting === 'wait' ? _c('svgWaiting') : _vm._e()], 1)])]);
+  }, [_vm._v(" " + _vm._s(_vm.messages.submit.first) + " ")]), _vm.waiting === 'wait' ? _c('svgWaiting') : _vm._e()], 1)]), _vm.showRegisterLink ? _c('div', [_c('hr', {
+    staticClass: "diviseur"
+  }), _c('small', [_vm._v(" Vous n'avez pas de compte ? ")]), _c('a', {
+    staticClass: "text-center d-block cursor",
+    attrs: {
+      "hre": "#"
+    },
+    on: {
+      "click": function click($event) {
+        $event.preventDefault();
+        return _vm.register.apply(null, arguments);
+      }
+    }
+  }, [_vm._v(" S'inscrire ")])]) : _vm._e()]);
 };
-var CheckStatusvue_type_template_id_9507e462_staticRenderFns = [];
+var CheckStatusvue_type_template_id_30ff0345_staticRenderFns = [];
 
-;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=template&id=9507e462&
+;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=template&id=30ff0345&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.iterator.js
 var es_array_iterator = __webpack_require__(6992);
@@ -1300,8 +1317,8 @@ var es_array_iterator = __webpack_require__(6992);
 var es_string_iterator = __webpack_require__(8783);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-collections.iterator.js
 var web_dom_collections_iterator = __webpack_require__(3948);
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=template&id=10b0f5ec&
-var LoginGooglevue_type_template_id_10b0f5ec_render = function render() {
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=template&id=655fd942&
+var LoginGooglevue_type_template_id_655fd942_render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c('div', {
@@ -1313,7 +1330,7 @@ var LoginGooglevue_type_template_id_10b0f5ec_render = function render() {
     }
   });
 };
-var LoginGooglevue_type_template_id_10b0f5ec_staticRenderFns = [];
+var LoginGooglevue_type_template_id_655fd942_staticRenderFns = [];
 
 ;// CONCATENATED MODULE: ./src/App/rx/google.js
 //const gapi = window.gapi;
@@ -1373,7 +1390,10 @@ function loadScript(src) {
       if (this.configs_login_rx_vuejs && this.configs_login_rx_vuejs.client_google_id) {
         this.initGoogle();
         return true;
-      } else return "";
+      } else {
+        console.log("Error de configuration de google, veillez denifir la clée 'client_google_id'");
+        return "";
+      }
     }
   }),
   methods: {
@@ -1391,16 +1411,15 @@ function loadScript(src) {
       var _this2 = this;
       var self = this;
       function handleCredentialResponse(response) {
-        console.log("Encoded JWT ID token: ", response);
         google.userAccess = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, response), {}, {
           client_id: response.clientId
         });
         self.TryToLoginWithGoogle();
         window.rxGoogle = google;
       }
-      console.log(" window.onload ! ", window.onload);
       var goo = function goo() {
         window.google.accounts.id.initialize({
+          // example => 51324xxxx-xxxxxxxxxxxxxxxxx8c4er.apps.googleusercontent.com
           client_id: _this2.configs_login_rx_vuejs.client_google_id,
           callback: handleCredentialResponse
         });
@@ -1455,10 +1474,10 @@ function loadScript(src) {
 });
 ;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=script&lang=js&
  /* harmony default export */ const components_LoginGooglevue_type_script_lang_js_ = (LoginGooglevue_type_script_lang_js_); 
-;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=10b0f5ec&prod&lang=scss&
+;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=655fd942&prod&lang=scss&
 // extracted by mini-css-extract-plugin
 
-;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=10b0f5ec&prod&lang=scss&
+;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue?vue&type=style&index=0&id=655fd942&prod&lang=scss&
 
 ;// CONCATENATED MODULE: ./src/App/components/LoginGoogle.vue
 
@@ -1471,8 +1490,8 @@ function loadScript(src) {
 
 var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
   components_LoginGooglevue_type_script_lang_js_,
-  LoginGooglevue_type_template_id_10b0f5ec_render,
-  LoginGooglevue_type_template_id_10b0f5ec_staticRenderFns,
+  LoginGooglevue_type_template_id_655fd942_render,
+  LoginGooglevue_type_template_id_655fd942_staticRenderFns,
   false,
   null,
   null,
@@ -1515,6 +1534,10 @@ var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
     actionAfterLogin: {
       type: String,
       required: true
+    },
+    showRegisterLink: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
@@ -1531,6 +1554,9 @@ var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
     },
     logOutFacebook: function logOutFacebook() {
       facebook.logOut();
+    },
+    register: function register() {
+      this.$emit("go-register");
     },
     /**
      * Verifie si l'utilisateur existe deja.
@@ -1565,18 +1591,24 @@ var LoginGoogle_component = (0,componentNormalizer/* default */.Z)(
 });
 ;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=script&lang=js&
  /* harmony default export */ const components_CheckStatusvue_type_script_lang_js_ = (CheckStatusvue_type_script_lang_js_); 
+;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/CheckStatus.vue?vue&type=style&index=0&id=30ff0345&prod&lang=scss&
+// extracted by mini-css-extract-plugin
+
+;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue?vue&type=style&index=0&id=30ff0345&prod&lang=scss&
+
 ;// CONCATENATED MODULE: ./src/App/components/CheckStatus.vue
 
 
 
+;
 
 
 /* normalize component */
-;
+
 var CheckStatus_component = (0,componentNormalizer/* default */.Z)(
   components_CheckStatusvue_type_script_lang_js_,
-  CheckStatusvue_type_template_id_9507e462_render,
-  CheckStatusvue_type_template_id_9507e462_staticRenderFns,
+  CheckStatusvue_type_template_id_30ff0345_render,
+  CheckStatusvue_type_template_id_30ff0345_staticRenderFns,
   false,
   null,
   null,
@@ -1773,9 +1805,9 @@ var SetPassword_component = (0,componentNormalizer/* default */.Z)(
 )
 
 /* harmony default export */ const SetPassword = (SetPassword_component.exports);
-;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/RegisTer.vue?vue&type=template&id=56272a3a&
+;// CONCATENATED MODULE: ./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/RegisTer.vue?vue&type=template&id=3f5866d2&
 
-var RegisTervue_type_template_id_56272a3a_render = function render() {
+var RegisTervue_type_template_id_3f5866d2_render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c('div', {
@@ -1794,61 +1826,97 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
     staticClass: "content-center__title"
   }, [_vm._v(_vm._s(_vm.messages.login))]), _c('div', {
     staticClass: "form-group content-center__input"
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.form.name[0].value,
-      expression: "form.name[0].value"
-    }],
-    staticClass: "form-control",
+  }, [_c('ValidationProvider', {
     attrs: {
-      "type": "text",
-      "readonly": "true",
-      "name": "name"
+      "name": "name",
+      "rules": "required"
     },
-    domProps: {
-      "value": _vm.form.name[0].value
-    },
-    on: {
-      "input": function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.form.name[0], "value", $event.target.value);
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(v) {
+        return [_c('input', {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.form.name[0].value,
+            expression: "form.name[0].value"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            "type": "text",
+            "readonly": _vm.readonlyName,
+            "name": "name"
+          },
+          domProps: {
+            "value": _vm.form.name[0].value
+          },
+          on: {
+            "input": function input($event) {
+              if ($event.target.composing) return;
+              _vm.$set(_vm.form.name[0], "value", $event.target.value);
+            }
+          }
+        }), _c('div', {
+          staticClass: "text-danger text-small"
+        }, _vm._l(v.errors, function (err, ii) {
+          return _c('small', {
+            key: ii,
+            staticClass: "d-block"
+          }, [_vm._v(" " + _vm._s(err) + " ")]);
+        }), 0)];
       }
-    }
-  })]), _vm.showPassword ? _c('h3', {
+    }], null, false, 3793439729)
+  })], 1), _vm.showPassword ? _c('h3', {
     staticClass: "content-center__title"
   }, [_vm._v(" " + _vm._s(_vm.messages.pass) + " ")]) : _vm._e(), _vm.showPassword ? _c('div', {
     staticClass: "form-group content-center__input"
-  }, [_vm.form.pass ? _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.form.pass[0].value,
-      expression: "form.pass[0].value"
-    }],
-    staticClass: "form-control",
+  }, [_c('ValidationProvider', {
     attrs: {
-      "type": "password",
-      "name": "pass"
+      "name": "pass",
+      "rules": "required"
     },
-    domProps: {
-      "value": _vm.form.pass[0].value
-    },
-    on: {
-      "input": function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.form.pass[0], "value", $event.target.value);
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(v) {
+        return [_vm.form.pass ? _c('input', {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.form.pass[0].value,
+            expression: "form.pass[0].value"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            "type": "password",
+            "name": "pass"
+          },
+          domProps: {
+            "value": _vm.form.pass[0].value
+          },
+          on: {
+            "input": function input($event) {
+              if ($event.target.composing) return;
+              _vm.$set(_vm.form.pass[0], "value", $event.target.value);
+            }
+          }
+        }) : _vm._e(), _c('div', {
+          staticClass: "text-danger text-small"
+        }, _vm._l(v.errors, function (err, ii) {
+          return _c('small', {
+            key: ii,
+            staticClass: "d-block"
+          }, [_vm._v(" " + _vm._s(err) + " ")]);
+        }), 0)];
       }
-    }
-  }) : _vm._e()]) : _vm._e(), _c('h3', {
+    }], null, false, 2464977794)
+  })], 1) : _vm._e(), _c('h3', {
     staticClass: "content-center__title"
   }, [_vm._v(_vm._s(_vm.messages.mail))]), _c('ValidationProvider', {
     ref: "mail",
     staticClass: "d-block w-100",
     attrs: {
       "name": "mail",
-      "rules": "required"
+      "rules": "required|email"
     },
     scopedSlots: _vm._u([{
       key: "default",
@@ -1878,36 +1946,14 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
           }
         })]), _c('div', {
           staticClass: "text-danger text-small"
-        }, _vm._l(v.errors, function (error, ii) {
+        }, _vm._l(v.errors, function (err, ii) {
           return _c('small', {
             key: ii,
             staticClass: "d-block"
-          }, [_vm._v(" " + _vm._s(error) + " ")]);
+          }, [_vm._v(" " + _vm._s(err) + " ")]);
         }), 0)];
       }
-    }], null, false, 3187930093)
-  }), _vm._l(_vm.templates, function (temp, i) {
-    return _c('ValidationProvider', {
-      key: i,
-      ref: temp.ref,
-      refInFor: true,
-      staticClass: "d-block w-100",
-      scopedSlots: _vm._u([{
-        key: "default",
-        fn: function fn(v) {
-          return [_c(temp, {
-            tag: "component"
-          }), _c('div', {
-            staticClass: "text-danger text-small"
-          }, _vm._l(v.errors, function (error, ii) {
-            return _c('small', {
-              key: ii,
-              staticClass: "d-block"
-            }, [_vm._v(" " + _vm._s(error) + " ")]);
-          }), 0)];
-        }
-      }], null, true)
-    });
+    }], null, false, 2930674861)
   }), _c('div', {
     staticClass: "content-center__btn"
   }, [_c('div', {
@@ -1917,13 +1963,11 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
     }
   }, [_c('span', {
     staticClass: "btn-login__text"
-  }, [_vm._v(" " + _vm._s(_vm.messages.submit.register) + " ")]), _vm.waiting == 'wait' ? _c('svgWaiting') : _vm._e()], 1)]), _c('hr')], 2) : _vm._e(), _vm.modelRegisterFormResult === 'generate_password' ? _c('div', [_c('h4', {
-    staticClass: "title"
-  }, [_vm._v("Creation automatique du compte")]), _c('p', {
-    staticClass: "mb-4"
-  }, [_vm._v(" Vos informations de connexion seront transferés à cette adresse. ")]), _vm.validEmail(_vm.form.name[0].value) ? _c('div', {
+  }, [_vm._v(" " + _vm._s(_vm.messages.submit.register) + " ")]), _vm.waiting == 'wait' ? _c('svgWaiting') : _vm._e()], 1)]), _c('hr')], 1) : _vm._e(), _vm.modelRegisterFormResult === 'generate_password' ? _c('div', [_c('h4', {
+    staticClass: "title mb-5"
+  }, [_vm._v("Creation automatique du compte")]), _vm.validEmail(_vm.form.name[0].value) ? _c('div', {
     staticClass: "mb-5"
-  }, [_c('strong', [_vm._v(" " + _vm._s(_vm.form.name[0].value) + " ")]), _vm._v(" " + _vm._s(_vm.set_email()) + " ")]) : _vm._e(), !_vm.validEmail(_vm.form.name[0].value) ? _c('div', [_c('ValidationProvider', {
+  }, [_c('p', [_vm._v("Vos informations de connexion seront transferés à cette adresse.")]), _c('strong', [_vm._v(" " + _vm._s(_vm.form.name[0].value) + " ")]), _vm._v(" " + _vm._s(_vm.set_email()) + " ")]) : _vm._e(), !_vm.validEmail(_vm.form.name[0].value) ? _c('div', [_c('ValidationProvider', {
     ref: "mail",
     staticClass: "d-block w-100",
     attrs: {
@@ -1935,7 +1979,9 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
       fn: function fn(v) {
         return [_c('div', {
           staticClass: "form-group content-center__input"
-        }, [_c('input', {
+        }, [_c('label', {
+          staticClass: "mb-0 pb-0"
+        }, [_vm._v(" Votre adresse email ")]), _c('input', {
           directives: [{
             name: "model",
             rawName: "v-model",
@@ -1956,7 +2002,7 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
               _vm.$set(_vm.form.mail[0], "value", $event.target.value);
             }
           }
-        })]), _c('div', {
+        }), _c('div', [_c('small', [_vm._v(" Vos informations de connexion seront transferés à cette adresse. ")])])]), _c('div', {
           staticClass: "text-danger text-small"
         }, _vm._l(v.errors, function (error, ii) {
           return _c('small', {
@@ -1965,7 +2011,7 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
           }, [_vm._v(" " + _vm._s(error) + " ")]);
         }), 0)];
       }
-    }], null, false, 3187930093)
+    }], null, false, 1488605717)
   })], 1) : _vm._e(), _c('div', {
     staticClass: "content-center__btn"
   }, [_c('div', {
@@ -1999,9 +2045,9 @@ var RegisTervue_type_template_id_56272a3a_render = function render() {
     }
   }, [_vm._v(" Retour ")])], 1);
 };
-var RegisTervue_type_template_id_56272a3a_staticRenderFns = [];
+var RegisTervue_type_template_id_3f5866d2_staticRenderFns = [];
 
-;// CONCATENATED MODULE: ./src/App/components/RegisTer.vue?vue&type=template&id=56272a3a&
+;// CONCATENATED MODULE: ./src/App/components/RegisTer.vue?vue&type=template&id=3f5866d2&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.for-each.js
 var es_array_for_each = __webpack_require__(9554);
@@ -2011,186 +2057,7 @@ var web_dom_collections_for_each = __webpack_require__(4747);
 var es_regexp_exec = __webpack_require__(4916);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.regexp.test.js
 var es_regexp_test = __webpack_require__(7601);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.js
-var es_symbol = __webpack_require__(2526);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.description.js
-var es_symbol_description = __webpack_require__(1817);
-;// CONCATENATED MODULE: ./src/App/formatFields/InputBootstrap.js
-
-
-
-
-
-
-/* harmony default export */ const InputBootstrap = ({
-  modelsFields: {},
-  /**
-   * La valeur par defaut peut etre definit via defaultValue, lors de la consctruction, ou definit dans <component.
-   * On recupere les données via un emit @b-input au niveau du <component.
-   * @param {} h
-   * @param {*} field
-   * @param {*} defaultValue
-   * @returns
-   */
-  string: function string(h, field) {
-    var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-    if (defaultValue.length === 0) {
-      defaultValue.push({
-        value: ""
-      });
-    }
-    var inputs = [];
-    // Ajout du label
-    inputs.push(h("label", {
-      "class": ["d-block", "content-center__title"]
-    }, [field.label_value]));
-    defaultValue.forEach(function (el) {
-      inputs.push(h("input", {
-        props: {
-          type: "text",
-          value: el.value,
-          b_input: {
-            type: Object,
-            required: true
-          }
-        },
-        on: {
-          input: function input(e) {
-            if (e.target && e.target.value) el.value = e.target.value;
-          }
-        },
-        "class": ["form-control"]
-      }));
-    });
-    // ajout de la description
-    inputs.push(h("small", {
-      "class": ["text-muted"]
-    }, [field.description]));
-    var formG = h("div", {
-      props: {},
-      "class": ["form-group", "content-center__input"]
-    }, inputs);
-    return formG;
-  }
-});
-;// CONCATENATED MODULE: ./src/App/formatFields/formatFieldsBootstrap.js
-
-
-
-
-
-
-
-
-
-
-/**
- * Permet de formater les champs drupal avec les equivalence bootstrap vuejs.
- */
-var formatField = /*#__PURE__*/function () {
-  function formatField(entity, bundle) {
-    (0,classCallCheck/* default */.Z)(this, formatField);
-    this.entity = entity;
-    this.bundle = bundle;
-    // ---------
-  }
-  /**
-   * Retoune les champs convertie en utilisant les composants bootstrap-vuejs.
-   * @returns Array []
-   */
-  (0,createClass/* default */.Z)(formatField, [{
-    key: "format",
-    value: function () {
-      var _format = (0,asyncToGenerator/* default */.Z)( /*#__PURE__*/(0,regeneratorRuntime/* default */.Z)().mark(function _callee() {
-        var _this = this;
-        var fields;
-        return (0,regeneratorRuntime/* default */.Z)().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return this.getFields();
-            case 2:
-              fields = _context.sent;
-              return _context.abrupt("return", new Promise(function (resolv, reject) {
-                if (fields.data && fields.data.fields) {
-                  InputBootstrap.modelsFields = _this.buildModel(fields.data.fields);
-                  var formatFields = [];
-                  var _loop = function _loop(i) {
-                    formatFields.push({
-                      ref: i,
-                      props: {
-                        name: {
-                          type: String,
-                          "default": fields.data.fields[i].name
-                        }
-                      },
-                      render: function render(createElement) {
-                        var renderField = [];
-                        switch (fields.data.fields[i].type) {
-                          case "string":
-                            renderField.push(InputBootstrap.string(createElement, fields.data.fields[i], InputBootstrap.modelsFields[i]));
-                            break;
-                        }
-                        return createElement("div", renderField);
-                      }
-                    });
-                  };
-                  for (var i in fields.data.fields) {
-                    _loop(i);
-                  }
-                  resolv({
-                    templates: formatFields,
-                    models: InputBootstrap.modelsFields
-                  });
-                } else {
-                  reject("Aucune donnée disponible");
-                }
-              }));
-            case 4:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee, this);
-      }));
-      function format() {
-        return _format.apply(this, arguments);
-      }
-      return format;
-    }()
-    /**
-     * Get fileds in drupal.
-     * @returns
-     */
-  }, {
-    key: "getFields",
-    value: function getFields() {
-      var url = "/api/form-node/generate-form";
-      if (this.entity === "user") {
-        url = "/api/form-node/generate-user";
-      }
-      url += "/" + this.bundle;
-      return App_utilities.get(url);
-    }
-    /**
-     * - Cet object permet de rendre les elements de l'object ecoutable.
-     *   on creer tous les champs, puis on initialise InputBootstrap.modelsFields avec tous les champs.
-     *   De cette facon vuejs peut ecouter les MAJ de champs.
-     */
-  }, {
-    key: "buildModel",
-    value: function buildModel(fields) {
-      var models = {};
-      for (var i in fields) {
-        if (fields[i].type) models[i] = [];
-      }
-      return models;
-    }
-  }]);
-  return formatField;
-}();
-/* harmony default export */ const formatFieldsBootstrap = (formatField);
 ;// CONCATENATED MODULE: ./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[1]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/RegisTer.vue?vue&type=script&lang=js&
-
 
 
 
@@ -2238,13 +2105,16 @@ var formatField = /*#__PURE__*/function () {
     showModalSuccess: {
       type: Boolean,
       required: true
+    },
+    readonlyName: {
+      type: Boolean,
+      "default": true
     }
   },
   data: function data() {
     return {
       messages: components_config.messages,
       waiting: "",
-      templates: [],
       /**
        * Drupal >9.5 renvoit l'erreur dans {message}
        */
@@ -2258,8 +2128,8 @@ var formatField = /*#__PURE__*/function () {
      * Resultat entre la config endur et celle en BD.
      */
     modelRegisterFormResult: function modelRegisterFormResult() {
-      if (this.modelRegisterForm) {
-        return this.modelRegisterForms;
+      if (this.modelRegisterForm == "generate_password" || this.modelRegisterForm == "default") {
+        return this.modelRegisterForm;
       } else if (this.configs_login_rx_vuejs && this.configs_login_rx_vuejs.generate_user) {
         return "generate_password";
       } else {
@@ -2277,7 +2147,6 @@ var formatField = /*#__PURE__*/function () {
     } else if (this.form.pass) {
       delete this.form.pass;
     }
-    this.getFields();
   },
   methods: {
     generatePassword: function generatePassword() {
@@ -2365,20 +2234,6 @@ var formatField = /*#__PURE__*/function () {
         }, _callee2);
       }))();
     },
-    /**
-     * --
-     */
-    getFields: function getFields() {
-      var _this3 = this;
-      var fds = new formatFieldsBootstrap("user", "user");
-      fds.format().then(function (resp) {
-        _this3.templates = resp.templates;
-        for (var fieldName in resp.models) {
-          _this3.$set(_this3.form, fieldName, resp.models[fieldName]);
-        }
-        console.log("resp : ", resp);
-      });
-    },
     validEmail: function validEmail(email) {
       var re = /\S+@\S+\.\S+/;
       return re.test(email);
@@ -2400,8 +2255,8 @@ var formatField = /*#__PURE__*/function () {
 ;
 var RegisTer_component = (0,componentNormalizer/* default */.Z)(
   components_RegisTervue_type_script_lang_js_,
-  RegisTervue_type_template_id_56272a3a_render,
-  RegisTervue_type_template_id_56272a3a_staticRenderFns,
+  RegisTervue_type_template_id_3f5866d2_render,
+  RegisTervue_type_template_id_3f5866d2_staticRenderFns,
   false,
   null,
   null,
@@ -2449,6 +2304,10 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
     showModalSuccess: {
       type: Boolean,
       "default": true
+    },
+    showRegisterLink: {
+      type: Boolean,
+      "default": true
     }
   },
   /**
@@ -2460,13 +2319,14 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
       waiting: "",
       stepe: CheckStatus,
       models: {},
-      baseURl: src_config.baseURl,
+      baseURl: rootConfig.baseURl,
       isBusy: false,
       alertDisplay: false,
       alertType: "alert-danger",
       alertText: "",
       urlLogo: window.location.origin + "" + window.logo_current_theme,
-      formValidate: {}
+      formValidate: {},
+      readonlyName: true
     };
   },
   computed: (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, (0,vuex_esm/* mapState */.rn)(["configs_login_rx_vuejs"])), {}, {
@@ -2491,6 +2351,10 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
       facebook.chargement();
     },
     selectStepe: function selectStepe(step) {
+      /**
+       * Dans la messure ou le changement se fait de maniere automatique on ne change pas la valeur de name.
+       */
+      this.readonlyName = true;
       switch (step) {
         case "checkstatus":
           this.stepe = CheckStatus;
@@ -2502,6 +2366,13 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
           this.stepe = RegisTer;
           break;
       }
+    },
+    goRegister: function goRegister() {
+      /**
+       * Dans la messure l'user click sur s'inscrire il peut editer le name.
+       */
+      this.readonlyName = false;
+      this.stepe = RegisTer;
     },
     /**
      * Ecoute un evenement afin de determiner si l'utilisateur a clique sur le bonton de connexion et que le processus soit terminé.
@@ -2606,10 +2477,10 @@ var RegisTer_component = (0,componentNormalizer/* default */.Z)(
 });
 ;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=script&lang=js&
  /* harmony default export */ const components_LoginRegistervue_type_script_lang_js_ = (LoginRegistervue_type_script_lang_js_); 
-;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=067c139e&prod&lang=scss&
+;// CONCATENATED MODULE: ./node_modules/mini-css-extract-plugin/dist/loader.js??clonedRuleSet-22.use[0]!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-22.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-22.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-22.use[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=d0a84bc4&prod&lang=scss&
 // extracted by mini-css-extract-plugin
 
-;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=067c139e&prod&lang=scss&
+;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue?vue&type=style&index=0&id=d0a84bc4&prod&lang=scss&
 
 ;// CONCATENATED MODULE: ./src/App/components/LoginRegister.vue
 
@@ -2636,4 +2507,4 @@ var LoginRegister_component = (0,componentNormalizer/* default */.Z)(
 /***/ })
 
 }]);
-//# sourceMappingURL=loginRxVuejs.common.987.js.map
+//# sourceMappingURL=loginRxVuejs.common.980.js.map
