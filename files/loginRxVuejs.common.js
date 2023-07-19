@@ -6680,7 +6680,7 @@ function _typeof(obj) {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.miniCssF = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "css/" + chunkId + "." + {"583":"7b7d8b61","980":"b9765a1b"}[chunkId] + ".css";
+/******/ 			return "css/" + chunkId + "." + {"583":"7b7d8b61","980":"d3995b68"}[chunkId] + ".css";
 /******/ 		};
 /******/ 	})();
 /******/ 	
