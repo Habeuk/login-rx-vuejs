@@ -109,7 +109,8 @@ class LoginRxVuejsController extends ControllerBase {
   }
   
   /**
-   * Pour l'envoit de mail on charger le plugin.mail confiurer par defaut via le
+   * Pour l'envoit de mail on charger le plugin.mail configurer par defaut via
+   * le
    * module MailSystem.
    *
    * @param string $to
@@ -183,19 +184,19 @@ class LoginRxVuejsController extends ControllerBase {
     }
     catch (loginRxVuejsException $e) {
       $content['message'] = $e->getMessage();
-      $content['code'] = $e->getCode();
+      $content['code'] = $e->getCode() ? $e->getCode() : 435;
       $content["loginRxVuejsException"] = $e->getTrace();
       return HttpResponse::response($content, $content['code'], $content['message']);
     } //
     catch (\Exception $e) {
       $content['message'] = $e->getMessage();
-      $content['code'] = $e->getCode();
+      $content['code'] = $e->getCode() ? $e->getCode() : 435;
       $content["Exception"] = $e->getTrace();
       return HttpResponse::response($content, $content['code'], $content['message']);
     } //
     catch (\Error $e) {
       $content['message'] = $e->getMessage();
-      $content['code'] = $e->getCode();
+      $content['code'] = $e->getCode() ? $e->getCode() : 435;
       $content["Error"] = $e->getTrace();
       return HttpResponse::response($content, $content['code'], $content['message']);
     }

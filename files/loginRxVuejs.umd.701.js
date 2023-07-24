@@ -892,11 +892,18 @@ if (typeof window !== "undefined" && window.Vue) {
     return stepe;
   }
 });
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.includes.js
+var modules_es_array_includes = __webpack_require__(6699);
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.includes.js
+var modules_es_string_includes = __webpack_require__(2023);
 ;// CONCATENATED MODULE: ./src/rootConfig.js
 
 
+
+
 var config = (0,objectSpread2/* default */.Z)((0,objectSpread2/* default */.Z)({}, basic), {}, {
-  TestDomain: "http://habeuk.kksa",
+  // on ne laisse la valeur par defaut, pour permttre au domaine local de pouvoir se connecter.
+  TestDomain: window.location.host.includes("localhost") ? "http://habeuk.kksa" : window.location.protocol + "//" + window.location.host,
   /**
    * Retoune un entier arleatoire entre [99-999]
    */

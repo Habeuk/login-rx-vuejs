@@ -11767,7 +11767,7 @@ if (elt.hasAttribute("model_register_form")) {
   model_register_form = document.getElementById(tag).getAttribute("model_register_form");
 }
 var loginRegister = function loginRegister() {
-  return Promise.all(/* import() */[__webpack_require__.e(782), __webpack_require__.e(701)]).then(__webpack_require__.bind(__webpack_require__, 8701)).then(function (component) {
+  return Promise.all(/* import() */[__webpack_require__.e(87), __webpack_require__.e(701)]).then(__webpack_require__.bind(__webpack_require__, 8701)).then(function (component) {
     return new Promise(function (resolv) {
       var callback = function callback() {
         resolv(component);
