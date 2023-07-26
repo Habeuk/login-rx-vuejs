@@ -1,112 +1,119 @@
 login_rx_vuejs.current_user:
-  path: '/login-rx-vuejs/current-user'
+  path: "/login-rx-vuejs/current-user"
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::currentUser'
   requirements:
-    _permission: 'access content'
-    
+    _permission: "access content"
+
 login_rx_vuejs.genratepassword:
-  path: '/login-rx-vuejs/genrate-password'
+  path: "/login-rx-vuejs/genrate-password"
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::GenratePassword'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
 
 #verifie si l'email ou le login existe deja.'
 login_rx_vuejs.check_user_status:
-  path: '/login-rx-vuejs/check-user-status'
+  path: "/login-rx-vuejs/check-user-status"
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::CheckUserStatus'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
   options:
     _maintenance_access: TRUE # Permet d'acceder à cette page en mode maintenance.
-    
+
 #recupere la configuration'
 login_rx_vuejs.get_configs:
-  path: '/login-rx-vuejs/get-configs'
+  path: "/login-rx-vuejs/get-configs"
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::getConfigs'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
   options:
     _maintenance_access: TRUE # Permet d'acceder à cette page en mode maintenance.
 
 #essaie de connecter l'utilisateur avec son login/email et son motdepass
 login_rx_vuejs.user_connexion:
-  path: '/login-rx-vuejs/user-connexion'
+  path: "/login-rx-vuejs/user-connexion"
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\LoginRxVuejsController::userConnexion'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
   options:
     _maintenance_access: TRUE # Permet d'acceder à cette page en mode maintenance.
 
 #Verifie si un utilisateur est deja connecté, et connecte cet utilisateur.
 login_rx_vuejs.facebook_check:
-  path: '/login-rx-vuejs/facebook-check'
+  path: "/login-rx-vuejs/facebook-check"
   methods: [POST]
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\FacebookController::CheckUser'
   requirements:
-    _permission: 'access content' 
+    _permission: "access content"
   options:
     _maintenance_access: TRUE # Permet d'acceder à cette page en mode maintenance.
 
 #Verifie les informations d'un utilisateur et cree son compte.
 login_rx_vuejs.facebook_login:
-  path: '/login-rx-vuejs/facebook-login'
+  path: "/login-rx-vuejs/facebook-login"
   methods: [POST]
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\FacebookController::Connexion'
   requirements:
-    _permission: 'access content'
-
+    _permission: "access content"
 
 #Verifie si un utilisateur est deja connecté, et connecte cet utilisateur.
 login_rx_vuejs.google_check:
-  path: '/login-rx-vuejs/google-check'
+  path: "/login-rx-vuejs/google-check"
   methods: [POST]
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::CheckUser'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
   options:
     _maintenance_access: TRUE # Permet d'acceder à cette page en mode maintenance.
 
 #Verifie les informations d'un utilisateur et cree son compte.
 login_rx_vuejs.google_login:
-  path: '/login-rx-vuejs/google-login'
+  path: "/login-rx-vuejs/google-login"
   methods: [POST]
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::Connexion'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
 
 #Url de redirect de google.
 login_rx_vuejs.google_redirect:
-  path: '/login-rx-vuejs/google-redirect'
+  path: "/login-rx-vuejs/google-redirect"
   methods: [POST]
   defaults:
-    _title: 'Example'
+    _title: "Example"
     _controller: '\Drupal\login_rx_vuejs\Controller\GoogleController::Callback'
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
 
+#test de récupération des reviews sur google
+login_rx_vuejs.google_reviews:
+  path: "/login-rx-vuejs/google-reviews"
+  defaults:
+    _title: "Example"
+    _controller: '\Drupal\login_rx_vuejs\Controller\ReviewsController::getReviews'
+  requirements:
+    _permission: "access content"
 
 login_rx_vuejs.settings_form:
-  path: '/admin/config/system/login-rx-vuejs'
+  path: "/admin/config/system/login-rx-vuejs"
   defaults:
-    _title: 'Login rx vuejs settings'
+    _title: "Login rx vuejs settings"
     _form: 'Drupal\login_rx_vuejs\Form\SettingsForm'
   requirements:
-    _permission: 'administer login_rx_vuejs configuration'
+    _permission: "administer login_rx_vuejs configuration"
