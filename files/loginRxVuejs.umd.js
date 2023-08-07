@@ -6690,7 +6690,7 @@ function _typeof(obj) {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.miniCssF = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "css/" + chunkId + "." + {"448":"7b7d8b61","701":"d3995b68"}[chunkId] + ".css";
+/******/ 			return "css/" + chunkId + "." + {"448":"7b7d8b61","504":"cd6b417d"}[chunkId] + ".css";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -6834,7 +6834,7 @@ function _typeof(obj) {
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.miniCss = (chunkId, promises) => {
-/******/ 			var cssChunks = {"448":1,"701":1};
+/******/ 			var cssChunks = {"448":1,"504":1};
 /******/ 			if(installedCssChunks[chunkId]) promises.push(installedCssChunks[chunkId]);
 /******/ 			else if(installedCssChunks[chunkId] !== 0 && cssChunks[chunkId]) {
 /******/ 				promises.push(installedCssChunks[chunkId] = loadStylesheet(chunkId).then(() => {
@@ -11767,7 +11767,7 @@ if (elt.hasAttribute("model_register_form")) {
   model_register_form = document.getElementById(tag).getAttribute("model_register_form");
 }
 var loginRegister = function loginRegister() {
-  return Promise.all(/* import() */[__webpack_require__.e(87), __webpack_require__.e(701)]).then(__webpack_require__.bind(__webpack_require__, 8701)).then(function (component) {
+  return Promise.all(/* import() */[__webpack_require__.e(87), __webpack_require__.e(504)]).then(__webpack_require__.bind(__webpack_require__, 3504)).then(function (component) {
     return new Promise(function (resolv) {
       var callback = function callback() {
         resolv(component);

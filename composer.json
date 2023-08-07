@@ -1,20 +1,20 @@
 {
-    "name": "stephane888/login_rx_vuejs",
-    "description": "connexion et inscription via les rx",
-    "type": "drupal-module-custom",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "stephane888",
-            "email": "kksasteph888@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-    	"drupal/mail_login": "^2.6",
-    	"drupal/mailsystem": "^4.4",    	
-    	"google/apiclient":"^2.11",
-    	"stephane888/apivuejs": "dev-1x|^1.0",
-    	"stephane888/drupal_utility": "^1.0|dev-1x"
+  "name": "habeuk/login_rx_vuejs",
+  "description": "connexion et inscription via les rx",
+  "type": "drupal-module-custom",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "stephane888",
+      "email": "kksasteph888@gmail.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/mail_login": "^2.6",
+    "drupal/mailsystem": "^4.4",
+    "google/apiclient": "^2.11",
+    "habeuk/apivuejs": "dev-1x|^1.0",
+    "habeuk/drupal_utility": "^1.0|dev-1x"
+  }
 }
