@@ -1,11 +1,11 @@
-((typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkdrupal_vuejs"] || []).push([[351],{
+((typeof self !== 'undefined' ? self : this)["webpackChunkloginRxVuejs"] = (typeof self !== 'undefined' ? self : this)["webpackChunkloginRxVuejs"] || []).push([[87],{
 
 /***/ 1001:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ normalizeComponent)
+/* harmony export */   "Z": () => (/* binding */ normalizeComponent)
 /* harmony export */ });
 /* globals __VUE_SSR_CONTEXT__ */
 
@@ -123,6 +123,43 @@ module.exports = {
 
 /***/ }),
 
+/***/ 4964:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var wellKnownSymbol = __webpack_require__(5112);
+
+var MATCH = wellKnownSymbol('match');
+
+module.exports = function (METHOD_NAME) {
+  var regexp = /./;
+  try {
+    '/./'[METHOD_NAME](regexp);
+  } catch (error1) {
+    try {
+      regexp[MATCH] = false;
+      return '/./'[METHOD_NAME](regexp);
+    } catch (error2) { /* empty */ }
+  } return false;
+};
+
+
+/***/ }),
+
+/***/ 7045:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var makeBuiltIn = __webpack_require__(6339);
+var defineProperty = __webpack_require__(3070);
+
+module.exports = function (target, name, descriptor) {
+  if (descriptor.get) makeBuiltIn(descriptor.get, name, { getter: true });
+  if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true });
+  return defineProperty.f(target, name, descriptor);
+};
+
+
+/***/ }),
+
 /***/ 3678:
 /***/ ((module) => {
 
@@ -157,15 +194,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 9363:
-/***/ ((module) => {
-
-/* global Bun -- Deno case */
-module.exports = typeof Bun == 'function' && Bun && typeof Bun.version == 'string';
-
-
-/***/ }),
-
 /***/ 7065:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -192,7 +220,6 @@ var construct = function (C, argsLength, args) {
 
 // `Function.prototype.bind` method implementation
 // https://tc39.es/ecma262/#sec-function.prototype.bind
-// eslint-disable-next-line es/no-function-prototype-bind -- detection
 module.exports = NATIVE_BIND ? $Function.bind : function bind(that /* , ...args */) {
   var F = aCallable(this);
   var Prototype = F.prototype;
@@ -215,6 +242,41 @@ var hasOwn = __webpack_require__(2597);
 
 module.exports = function (descriptor) {
   return descriptor !== undefined && (hasOwn(descriptor, 'value') || hasOwn(descriptor, 'writable'));
+};
+
+
+/***/ }),
+
+/***/ 7850:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var isObject = __webpack_require__(111);
+var classof = __webpack_require__(4326);
+var wellKnownSymbol = __webpack_require__(5112);
+
+var MATCH = wellKnownSymbol('match');
+
+// `IsRegExp` abstract operation
+// https://tc39.es/ecma262/#sec-isregexp
+module.exports = function (it) {
+  var isRegExp;
+  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classof(it) == 'RegExp');
+};
+
+
+/***/ }),
+
+/***/ 3929:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var isRegExp = __webpack_require__(7850);
+
+var $TypeError = TypeError;
+
+module.exports = function (it) {
+  if (isRegExp(it)) {
+    throw $TypeError("The method doesn't accept regular expressions");
+  } return it;
 };
 
 
@@ -446,37 +508,36 @@ module.exports = fails(function () {
 /***/ 7152:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-"use strict";
-
 var global = __webpack_require__(7854);
 var apply = __webpack_require__(2104);
 var isCallable = __webpack_require__(614);
-var ENGINE_IS_BUN = __webpack_require__(9363);
-var USER_AGENT = __webpack_require__(8113);
+var userAgent = __webpack_require__(8113);
 var arraySlice = __webpack_require__(206);
 var validateArgumentsLength = __webpack_require__(8053);
 
+var MSIE = /MSIE .\./.test(userAgent); // <- dirty ie9- check
 var Function = global.Function;
-// dirty IE9- and Bun 0.3.0- checks
-var WRAP = /MSIE .\./.test(USER_AGENT) || ENGINE_IS_BUN && (function () {
-  var version = global.Bun.version.split('.');
-  return version.length < 3 || version[0] == 0 && (version[1] < 3 || version[1] == 3 && version[2] == 0);
-})();
 
-// IE9- / Bun 0.3.0- setTimeout / setInterval / setImmediate additional parameters fix
-// https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timers
-// https://github.com/oven-sh/bun/issues/1633
-module.exports = function (scheduler, hasTimeArg) {
-  var firstParamIndex = hasTimeArg ? 2 : 1;
-  return WRAP ? function (handler, timeout /* , ...arguments */) {
-    var boundArgs = validateArgumentsLength(arguments.length, 1) > firstParamIndex;
+var wrap = function (scheduler) {
+  return MSIE ? function (handler, timeout /* , ...arguments */) {
+    var boundArgs = validateArgumentsLength(arguments.length, 1) > 2;
     var fn = isCallable(handler) ? handler : Function(handler);
-    var params = boundArgs ? arraySlice(arguments, firstParamIndex) : [];
-    var callback = boundArgs ? function () {
-      apply(fn, this, params);
-    } : fn;
-    return hasTimeArg ? scheduler(callback, timeout) : scheduler(callback);
+    var args = boundArgs ? arraySlice(arguments, 2) : undefined;
+    return scheduler(boundArgs ? function () {
+      apply(fn, this, args);
+    } : fn, timeout);
   } : scheduler;
+};
+
+// ie9- setTimeout & setInterval additional parameters fix
+// https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timers
+module.exports = {
+  // `setTimeout` method
+  // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-settimeout
+  setTimeout: wrap(global.setTimeout),
+  // `setInterval` method
+  // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-setinterval
+  setInterval: wrap(global.setInterval)
 };
 
 
@@ -493,6 +554,35 @@ module.exports = function (name) {
     if (IS_NODE) return Function('return require("' + name + '")')();
   } catch (error) { /* empty */ }
 };
+
+
+/***/ }),
+
+/***/ 6699:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+var $ = __webpack_require__(2109);
+var $includes = (__webpack_require__(1318).includes);
+var fails = __webpack_require__(7293);
+var addToUnscopables = __webpack_require__(1223);
+
+// FF99+ bug
+var BROKEN_ON_SPARSE = fails(function () {
+  return !Array(1).includes();
+});
+
+// `Array.prototype.includes` method
+// https://tc39.es/ecma262/#sec-array.prototype.includes
+$({ target: 'Array', proto: true, forced: BROKEN_ON_SPARSE }, {
+  includes: function includes(el /* , fromIndex = 0 */) {
+    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables('includes');
 
 
 /***/ }),
@@ -590,7 +680,6 @@ var bind = __webpack_require__(7065);
 
 // `Function.prototype.bind` method
 // https://tc39.es/ecma262/#sec-function.prototype.bind
-// eslint-disable-next-line es/no-function-prototype-bind -- detection
 $({ target: 'Function', proto: true, forced: Function.bind !== bind }, {
   bind: bind
 });
@@ -604,7 +693,7 @@ $({ target: 'Function', proto: true, forced: Function.bind !== bind }, {
 var DESCRIPTORS = __webpack_require__(9781);
 var FUNCTION_NAME_EXISTS = (__webpack_require__(6530).EXISTS);
 var uncurryThis = __webpack_require__(1702);
-var defineBuiltInAccessor = __webpack_require__(7045);
+var defineProperty = (__webpack_require__(3070).f);
 
 var FunctionPrototype = Function.prototype;
 var functionToString = uncurryThis(FunctionPrototype.toString);
@@ -615,7 +704,7 @@ var NAME = 'name';
 // Function instances `.name` property
 // https://tc39.es/ecma262/#sec-function-instances-name
 if (DESCRIPTORS && !FUNCTION_NAME_EXISTS) {
-  defineBuiltInAccessor(FunctionPrototype, NAME, {
+  defineProperty(FunctionPrototype, NAME, {
     configurable: true,
     get: function () {
       try {
@@ -917,6 +1006,35 @@ $({ target: 'RegExp', proto: true, forced: !DELEGATES_TO_EXEC }, {
 
 /***/ }),
 
+/***/ 2023:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+var $ = __webpack_require__(2109);
+var uncurryThis = __webpack_require__(1702);
+var notARegExp = __webpack_require__(3929);
+var requireObjectCoercible = __webpack_require__(4488);
+var toString = __webpack_require__(1340);
+var correctIsRegExpLogic = __webpack_require__(4964);
+
+var stringIndexOf = uncurryThis(''.indexOf);
+
+// `String.prototype.includes` method
+// https://tc39.es/ecma262/#sec-string.prototype.includes
+$({ target: 'String', proto: true, forced: !correctIsRegExpLogic('includes') }, {
+  includes: function includes(searchString /* , position = 0 */) {
+    return !!~stringIndexOf(
+      toString(requireObjectCoercible(this)),
+      toString(notARegExp(searchString)),
+      arguments.length > 1 ? arguments[1] : undefined
+    );
+  }
+});
+
+
+/***/ }),
+
 /***/ 2443:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -951,10 +1069,8 @@ setToStringTag(getBuiltIn('Symbol'), 'Symbol');
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 var $ = __webpack_require__(2109);
-var global = __webpack_require__(7854);
 var getBuiltIn = __webpack_require__(5005);
 var uncurryThis = __webpack_require__(1702);
-var call = __webpack_require__(6916);
 var fails = __webpack_require__(7293);
 var toString = __webpack_require__(1340);
 var validateArgumentsLength = __webpack_require__(8053);
@@ -976,11 +1092,10 @@ var WRONG_ARITY = !!$btoa && $btoa.length !== 1;
 
 // `btoa` method
 // https://html.spec.whatwg.org/multipage/webappapis.html#dom-btoa
-$({ global: true, bind: true, enumerable: true, forced: NO_ARG_RECEIVING_CHECK || WRONG_ARG_CONVERSION || WRONG_ARITY }, {
+$({ global: true, enumerable: true, forced: NO_ARG_RECEIVING_CHECK || WRONG_ARG_CONVERSION || WRONG_ARITY }, {
   btoa: function btoa(data) {
     validateArgumentsLength(arguments.length, 1);
-    // `webpack` dev server bug on IE global methods - use call(fn, global, ...)
-    if (NO_ARG_RECEIVING_CHECK || WRONG_ARG_CONVERSION || WRONG_ARITY) return call($btoa, global, toString(data));
+    if (NO_ARG_RECEIVING_CHECK || WRONG_ARG_CONVERSION || WRONG_ARITY) return $btoa(toString(data));
     var string = toString(data);
     var output = '';
     var position = 0;
@@ -1086,11 +1201,8 @@ var getterFor = function (key) {
 };
 
 if (DESCRIPTORS) {
-  // `DOMException.prototype.code` getter
   defineBuiltInAccessor(DOMExceptionPrototype, 'code', getterFor('code'));
-  // `DOMException.prototype.message` getter
   defineBuiltInAccessor(DOMExceptionPrototype, 'message', getterFor('message'));
-  // `DOMException.prototype.name` getter
   defineBuiltInAccessor(DOMExceptionPrototype, 'name', getterFor('name'));
 }
 
@@ -1137,7 +1249,6 @@ if (INCORRECT_CODE && DESCRIPTORS && NativeDOMException === PolyfilledDOMExcepti
   }));
 }
 
-// `DOMException` constants
 for (var key in DOMExceptionConstants) if (hasOwn(DOMExceptionConstants, key)) {
   var constant = DOMExceptionConstants[key];
   var constantName = constant.s;
@@ -1237,7 +1348,6 @@ var setToStringTag = __webpack_require__(8003);
 
 var DOM_EXCEPTION = 'DOMException';
 
-// `DOMException.prototype[@@toStringTag]` property
 setToStringTag(getBuiltIn(DOM_EXCEPTION), DOM_EXCEPTION);
 
 
@@ -1248,11 +1358,9 @@ setToStringTag(getBuiltIn(DOM_EXCEPTION), DOM_EXCEPTION);
 
 var $ = __webpack_require__(2109);
 var global = __webpack_require__(7854);
-var schedulersFix = __webpack_require__(7152);
+var setInterval = (__webpack_require__(7152).setInterval);
 
-var setInterval = schedulersFix(global.setInterval, true);
-
-// Bun / IE9- setInterval additional parameters fix
+// ie9- setInterval additional parameters fix
 // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-setinterval
 $({ global: true, bind: true, forced: global.setInterval !== setInterval }, {
   setInterval: setInterval
@@ -1266,11 +1374,9 @@ $({ global: true, bind: true, forced: global.setInterval !== setInterval }, {
 
 var $ = __webpack_require__(2109);
 var global = __webpack_require__(7854);
-var schedulersFix = __webpack_require__(7152);
+var setTimeout = (__webpack_require__(7152).setTimeout);
 
-var setTimeout = schedulersFix(global.setTimeout, true);
-
-// Bun / IE9- setTimeout additional parameters fix
+// ie9- setTimeout additional parameters fix
 // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-settimeout
 $({ global: true, bind: true, forced: global.setTimeout !== setTimeout }, {
   setTimeout: setTimeout
@@ -3045,10 +3151,11 @@ module.exports = {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ BButtonClose)
+/* harmony export */   "Z": () => (/* binding */ BButtonClose)
 /* harmony export */ });
 /* unused harmony export props */
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7137);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(2491);
 /* harmony import */ var _constants_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7825);
 /* harmony import */ var _constants_props__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3022);
@@ -3076,7 +3183,7 @@ var props = (0,_utils_props__WEBPACK_IMPORTED_MODULE_0__/* .makePropsConfigurabl
 }, _constants_components__WEBPACK_IMPORTED_MODULE_2__/* .NAME_BUTTON_CLOSE */ .gi); // --- Main component ---
 // @vue/component
 
-var BButtonClose = /*#__PURE__*/(0,_vue__WEBPACK_IMPORTED_MODULE_3__/* .extend */ .l7)({
+var BButtonClose = /*#__PURE__*/_vue__WEBPACK_IMPORTED_MODULE_3___default().extend({
   name: _constants_components__WEBPACK_IMPORTED_MODULE_2__/* .NAME_BUTTON_CLOSE */ .gi,
   functional: true,
   props: props,
@@ -3126,14 +3233,15 @@ var BButtonClose = /*#__PURE__*/(0,_vue__WEBPACK_IMPORTED_MODULE_3__/* .extend *
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  we: () => (/* binding */ BLink),
-  NQ: () => (/* binding */ link_props)
+  "we": () => (/* binding */ BLink),
+  "NQ": () => (/* binding */ link_props)
 });
 
 // UNUSED EXPORTS: nuxtLinkProps, routerLinkProps
 
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
-var vue = __webpack_require__(7137);
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/components.js
 var components = __webpack_require__(7825);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/events.js
@@ -3152,8 +3260,8 @@ var inspect = __webpack_require__(6498);
 var object = __webpack_require__(6819);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/props.js
 var utils_props = __webpack_require__(3194);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js + 1 modules
-var router = __webpack_require__(1955);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js
+var router = __webpack_require__(9022);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/attrs.js
 var attrs = __webpack_require__(6741);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/listen-on-root.js
@@ -3161,29 +3269,8 @@ var listen_on_root = __webpack_require__(2533);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/cache.js + 1 modules
 var cache = __webpack_require__(5535);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/listeners.js
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-
-var listenersMixinVue2 = (0,cache/* makePropCacheMixin */.L)('$listeners', 'bvListeners');
-var listenersMixinVue3 = (0,vue/* extend */.l7)({
-  data: function data() {
-    return {
-      bvListeners: {}
-    };
-  },
-  created: function created() {
-    this.bvListeners = _objectSpread({}, this.$listeners);
-  },
-  beforeUpdate: function beforeUpdate() {
-    this.bvListeners = _objectSpread({}, this.$listeners);
-  }
-});
-var listenersMixin = vue/* isVue3 */.$B ? listenersMixinVue3 : listenersMixinVue2;
+var listenersMixin = (0,cache/* makePropCacheMixin */.L)('$listeners', 'bvListeners');
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/normalize-slot.js
 var normalize_slot = __webpack_require__(5167);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/link/link.js
@@ -3193,17 +3280,17 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function link_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function link_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? link_ownKeys(Object(source), !0).forEach(function (key) { link_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : link_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function link_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -3227,13 +3314,11 @@ var ROOT_EVENT_NAME_CLICKED = (0,utils_events/* getRootEventName */.J3)(componen
 var routerLinkProps = {
   activeClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   append: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
-  event: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_ARRAY_STRING */.Mu),
+  event: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_ARRAY_STRING */.Mu, events/* EVENT_NAME_CLICK */.PZ),
   exact: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
   exactActiveClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
-  exactPath: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
-  exactPathActiveClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   replace: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
-  routerTag: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
+  routerTag: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, 'a'),
   to: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_OBJECT_STRING */.ZW)
 }; // `<nuxt-link>` specific props
 
@@ -3248,7 +3333,7 @@ var nuxtLinkProps = {
   prefetch: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, null)
 }; // All `<b-link>` props
 
-var link_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sortKeys */.GE)(link_objectSpread(link_objectSpread(link_objectSpread({}, nuxtLinkProps), routerLinkProps), {}, {
+var link_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sortKeys */.GE)(_objectSpread(_objectSpread(_objectSpread({}, nuxtLinkProps), routerLinkProps), {}, {
   active: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
   disabled: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
   href: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
@@ -3263,7 +3348,7 @@ var link_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sortK
 })), components/* NAME_LINK */.wE); // --- Main component ---
 // @vue/component
 
-var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BLink = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_LINK */.wE,
   // Mixin order is important!
   mixins: [attrs/* attrsMixin */.D, listenersMixin, listen_on_root/* listenOnRootMixin */.E, normalize_slot/* normalizeSlotMixin */.Z],
@@ -3303,16 +3388,13 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
       }, this.computedTag);
     },
     computedProps: function computedProps() {
-      var event = this.event,
-          prefetch = this.prefetch,
-          routerTag = this.routerTag;
-      return this.isRouterLink ? link_objectSpread(link_objectSpread(link_objectSpread(link_objectSpread({}, (0,utils_props/* pluckProps */.uj)((0,object/* omit */.CE)(link_objectSpread(link_objectSpread({}, routerLinkProps), this.computedTag === 'nuxt-link' ? nuxtLinkProps : {}), ['event', 'prefetch', 'routerTag']), this)), event ? {
-        event: event
-      } : {}), (0,inspect/* isBoolean */.jn)(prefetch) ? {
-        prefetch: prefetch
-      } : {}), routerTag ? {
-        tag: routerTag
-      } : {}) : {};
+      var prefetch = this.prefetch;
+      return this.isRouterLink ? _objectSpread(_objectSpread({}, (0,utils_props/* pluckProps */.uj)(_objectSpread(_objectSpread({}, routerLinkProps), nuxtLinkProps), this)), {}, {
+        // Coerce `prefetch` value `null` to be `undefined`
+        prefetch: (0,inspect/* isBoolean */.jn)(prefetch) ? prefetch : undefined,
+        // Pass `router-tag` as `tag` prop
+        tag: this.routerTag
+      }) : {};
     },
     computedAttrs: function computedAttrs() {
       var bvAttrs = this.bvAttrs,
@@ -3322,9 +3404,9 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
           target = this.target,
           routerTag = this.routerTag,
           isRouterLink = this.isRouterLink;
-      return link_objectSpread(link_objectSpread(link_objectSpread(link_objectSpread({}, bvAttrs), href ? {
+      return _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, bvAttrs), href ? {
         href: href
-      } : {}), isRouterLink && routerTag && !(0,dom/* isTag */.YR)(routerTag, 'a') ? {} : {
+      } : {}), isRouterLink && !(0,dom/* isTag */.YR)(routerTag, 'a') ? {} : {
         rel: rel,
         target: target
       }), {}, {
@@ -3333,7 +3415,7 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
       });
     },
     computedListeners: function computedListeners() {
-      return link_objectSpread(link_objectSpread({}, this.bvListeners), {}, {
+      return _objectSpread(_objectSpread({}, this.bvListeners), {}, {
         // We want to overwrite any click handler since our callback
         // will invoke the user supplied handler(s) if `!this.disabled`
         click: this.onClick
@@ -3355,16 +3437,11 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
           immediatePropagation: true
         });
       } else {
-        // Router links do not emit instance `click` events, so we
-        // add in an `$emit('click', event)` on its Vue instance
-        //
-        // seems not to be required for Vue3 compat build
-
         /* istanbul ignore next: difficult to test, but we know it works */
-        if (isRouterLink) {
-          var _event$currentTarget$;
-
-          (_event$currentTarget$ = event.currentTarget.__vue__) === null || _event$currentTarget$ === void 0 ? void 0 : _event$currentTarget$.$emit(events/* EVENT_NAME_CLICK */.PZ, event);
+        if (isRouterLink && event.currentTarget.__vue__) {
+          // Router links do not emit instance `click` events, so we
+          // add in an `$emit('click', event)` on its Vue instance
+          event.currentTarget.__vue__.$emit(events/* EVENT_NAME_CLICK */.PZ, event);
         } // Call the suppliedHandler(s), if any provided
 
 
@@ -3397,7 +3474,7 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
   render: function render(h) {
     var active = this.active,
         disabled = this.disabled;
-    return h(this.computedTag, link_defineProperty({
+    return h(this.computedTag, _defineProperty({
       class: {
         active: active,
         disabled: disabled
@@ -3410,18 +3487,21 @@ var BLink = /*#__PURE__*/(0,vue/* extend */.l7)({
 
 /***/ }),
 
-/***/ 4869:
+/***/ 742:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  k: () => (/* binding */ ModalPlugin)
+  "k": () => (/* binding */ ModalPlugin)
 });
 
 // UNUSED EXPORTS: BModal
 
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
 var vue = __webpack_require__(7137);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/components.js
@@ -3483,9 +3563,9 @@ var object = __webpack_require__(6819);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/warn.js + 1 modules
 var warn = __webpack_require__(4760);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/observe-dom.js
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -3572,61 +3652,63 @@ var id = __webpack_require__(9347);
 
 
 
+
  // --- Constants ---
 
-var PROP = '$_documentListeners'; // --- Mixin ---
+var PROP = '$_bv_documentHandlers_'; // --- Mixin ---
 // @vue/component
 
-var listenOnDocumentMixin = (0,vue/* extend */.l7)({
+var listenOnDocumentMixin = external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   created: function created() {
-    // Define non-reactive property
-    // Object of arrays, keyed by event name,
-    // where value is an array of callbacks
-    this[PROP] = {};
-  },
-  beforeDestroy: function beforeDestroy() {
     var _this = this;
 
-    // Unregister all registered listeners
-    (0,object/* keys */.XP)(this[PROP] || {}).forEach(function (event) {
-      _this[PROP][event].forEach(function (callback) {
-        _this.listenOffDocument(event, callback);
+    /* istanbul ignore next */
+    if (!env/* IS_BROWSER */.Qg) {
+      return;
+    } // Declare non-reactive property
+    // Object of arrays, keyed by event name,
+    // where value is an array of handlers
+    // Prop will be defined on client only
+
+
+    this[PROP] = {}; // Set up our beforeDestroy handler (client only)
+
+    this.$once(events/* HOOK_EVENT_NAME_BEFORE_DESTROY */.vl, function () {
+      var items = _this[PROP] || {}; // Immediately delete this[PROP] to prevent the
+      // listenOn/Off methods from running (which may occur
+      // due to requestAnimationFrame/transition delays)
+
+      delete _this[PROP]; // Remove all registered event handlers
+
+      (0,object/* keys */.XP)(items).forEach(function (eventName) {
+        var handlers = items[eventName] || [];
+        handlers.forEach(function (handler) {
+          return (0,utils_events/* eventOff */.QY)(document, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
+        });
       });
     });
-    this[PROP] = null;
   },
   methods: {
-    registerDocumentListener: function registerDocumentListener(event, callback) {
-      if (this[PROP]) {
-        this[PROP][event] = this[PROP][event] || [];
+    listenDocument: function listenDocument(on, eventName, handler) {
+      on ? this.listenOnDocument(eventName, handler) : this.listenOffDocument(eventName, handler);
+    },
+    listenOnDocument: function listenOnDocument(eventName, handler) {
+      if (this[PROP] && (0,inspect/* isString */.HD)(eventName) && (0,inspect/* isFunction */.mf)(handler)) {
+        this[PROP][eventName] = this[PROP][eventName] || [];
 
-        if (!(0,array/* arrayIncludes */.kI)(this[PROP][event], callback)) {
-          this[PROP][event].push(callback);
+        if (!(0,array/* arrayIncludes */.kI)(this[PROP][eventName], handler)) {
+          this[PROP][eventName].push(handler);
+          (0,utils_events/* eventOn */.XO)(document, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
         }
       }
     },
-    unregisterDocumentListener: function unregisterDocumentListener(event, callback) {
-      if (this[PROP] && this[PROP][event]) {
-        this[PROP][event] = this[PROP][event].filter(function (cb) {
-          return cb !== callback;
+    listenOffDocument: function listenOffDocument(eventName, handler) {
+      if (this[PROP] && (0,inspect/* isString */.HD)(eventName) && (0,inspect/* isFunction */.mf)(handler)) {
+        (0,utils_events/* eventOff */.QY)(document, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
+        this[PROP][eventName] = (this[PROP][eventName] || []).filter(function (h) {
+          return h !== handler;
         });
       }
-    },
-    listenDocument: function listenDocument(on, event, callback) {
-      on ? this.listenOnDocument(event, callback) : this.listenOffDocument(event, callback);
-    },
-    listenOnDocument: function listenOnDocument(event, callback) {
-      if (env/* IS_BROWSER */.Qg) {
-        (0,utils_events/* eventOn */.XO)(document, event, callback, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
-        this.registerDocumentListener(event, callback);
-      }
-    },
-    listenOffDocument: function listenOffDocument(event, callback) {
-      if (env/* IS_BROWSER */.Qg) {
-        (0,utils_events/* eventOff */.QY)(document, event, callback, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
-      }
-
-      this.unregisterDocumentListener(event, callback);
     }
   }
 });
@@ -3638,61 +3720,56 @@ var listen_on_root = __webpack_require__(2533);
 
 
 
+
  // --- Constants ---
 
-var listen_on_window_PROP = '$_windowListeners'; // --- Mixin ---
+var listen_on_window_PROP = '$_bv_windowHandlers_'; // --- Mixin ---
 // @vue/component
 
-var listenOnWindowMixin = (0,vue/* extend */.l7)({
-  created: function created() {
-    // Define non-reactive property
+var listenOnWindowMixin = external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
+  beforeCreate: function beforeCreate() {
+    // Declare non-reactive property
     // Object of arrays, keyed by event name,
-    // where value is an array of callbacks
+    // where value is an array of handlers
     this[listen_on_window_PROP] = {};
   },
   beforeDestroy: function beforeDestroy() {
-    var _this = this;
+    if (env/* IS_BROWSER */.Qg) {
+      var items = this[listen_on_window_PROP]; // Immediately delete this[PROP] to prevent the
+      // listenOn/Off methods from running (which may occur
+      // due to requestAnimationFrame delays)
 
-    // Unregister all registered listeners
-    (0,object/* keys */.XP)(this[listen_on_window_PROP] || {}).forEach(function (event) {
-      _this[listen_on_window_PROP][event].forEach(function (callback) {
-        _this.listenOffWindow(event, callback);
+      delete this[listen_on_window_PROP]; // Remove all registered event handlers
+
+      (0,object/* keys */.XP)(items).forEach(function (eventName) {
+        var handlers = items[eventName] || [];
+        handlers.forEach(function (handler) {
+          return (0,utils_events/* eventOff */.QY)(window, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
+        });
       });
-    });
-    this[listen_on_window_PROP] = null;
+    }
   },
   methods: {
-    registerWindowListener: function registerWindowListener(event, callback) {
-      if (this[listen_on_window_PROP]) {
-        this[listen_on_window_PROP][event] = this[listen_on_window_PROP][event] || [];
+    listenWindow: function listenWindow(on, eventName, handler) {
+      on ? this.listenOnWindow(eventName, handler) : this.listenOffWindow(eventName, handler);
+    },
+    listenOnWindow: function listenOnWindow(eventName, handler) {
+      if (env/* IS_BROWSER */.Qg && this[listen_on_window_PROP] && (0,inspect/* isString */.HD)(eventName) && (0,inspect/* isFunction */.mf)(handler)) {
+        this[listen_on_window_PROP][eventName] = this[listen_on_window_PROP][eventName] || [];
 
-        if (!(0,array/* arrayIncludes */.kI)(this[listen_on_window_PROP][event], callback)) {
-          this[listen_on_window_PROP][event].push(callback);
+        if (!(0,array/* arrayIncludes */.kI)(this[listen_on_window_PROP][eventName], handler)) {
+          this[listen_on_window_PROP][eventName].push(handler);
+          (0,utils_events/* eventOn */.XO)(window, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
         }
       }
     },
-    unregisterWindowListener: function unregisterWindowListener(event, callback) {
-      if (this[listen_on_window_PROP] && this[listen_on_window_PROP][event]) {
-        this[listen_on_window_PROP][event] = this[listen_on_window_PROP][event].filter(function (cb) {
-          return cb !== callback;
+    listenOffWindow: function listenOffWindow(eventName, handler) {
+      if (env/* IS_BROWSER */.Qg && this[listen_on_window_PROP] && (0,inspect/* isString */.HD)(eventName) && (0,inspect/* isFunction */.mf)(handler)) {
+        (0,utils_events/* eventOff */.QY)(window, eventName, handler, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
+        this[listen_on_window_PROP][eventName] = (this[listen_on_window_PROP][eventName] || []).filter(function (h) {
+          return h !== handler;
         });
       }
-    },
-    listenWindow: function listenWindow(on, event, callback) {
-      on ? this.listenOnWindow(event, callback) : this.listenOffWindow(event, callback);
-    },
-    listenOnWindow: function listenOnWindow(event, callback) {
-      if (env/* IS_BROWSER */.Qg) {
-        (0,utils_events/* eventOn */.XO)(window, event, callback, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
-        this.registerWindowListener(event, callback);
-      }
-    },
-    listenOffWindow: function listenOffWindow(event, callback) {
-      if (env/* IS_BROWSER */.Qg) {
-        (0,utils_events/* eventOff */.QY)(window, event, callback, events/* EVENT_OPTIONS_NO_CAPTURE */.IJ);
-      }
-
-      this.unregisterWindowListener(event, callback);
     }
   }
 });
@@ -3702,14 +3779,14 @@ var normalize_slot = __webpack_require__(5167);
 var scoped_style = __webpack_require__(2352);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/vue-functional-data-merge/dist/lib.esm.js
 var lib_esm = __webpack_require__(2491);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js + 1 modules
-var router = __webpack_require__(1955);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js
+var router = __webpack_require__(9022);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/link/link.js + 1 modules
 var link_link = __webpack_require__(1151);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/button/button.js
-function button_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function button_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function button_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? button_ownKeys(Object(source), !0).forEach(function (key) { button_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : button_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function button_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { button_ownKeys(Object(source), true).forEach(function (key) { button_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { button_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function button_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -3826,7 +3903,7 @@ var computeAttrs = function computeAttrs(props, data) {
 // @vue/component
 
 
-var BButton = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BButton = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_BUTTON */.MZ,
   functional: true,
   props: button_props,
@@ -3888,22 +3965,14 @@ var BButton = /*#__PURE__*/(0,vue/* extend */.l7)({
       attrs: computeAttrs(props, data),
       on: on
     };
-    return h(link ? link_link/* BLink */.we : props.tag, (0,lib_esm/* mergeData */.b)(button_objectSpread(button_objectSpread({}, data), {}, {
-      props: undefined
-    }), componentData), children);
+    return h(link ? link_link/* BLink */.we : props.tag, (0,lib_esm/* mergeData */.b)(data, componentData), children);
   }
 });
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/button/button-close.js
 var button_close = __webpack_require__(5923);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/transition/bv-transition.js
 var bv_transition = __webpack_require__(185);
-// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
-var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(3797);
-var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/create-new-child-component.js
-var create_new_child_component = __webpack_require__(2705);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/transporter/transporter.js
-
 
 
 
@@ -3929,7 +3998,7 @@ var create_new_child_component = __webpack_require__(2705);
 // Supports only a single root element
 // @vue/component
 
-var BVTransporterTarget = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BVTransporterTarget = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   // As an abstract component, it doesn't appear in the $parent chain of
   // components, which means the next parent of any component rendered inside
   // of this one will be the parent from which is was portal'd
@@ -3974,7 +4043,7 @@ var transporter_props = {
 }; // --- Main component ---
 // @vue/component
 
-var BVTransporterVue2 = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BVTransporter = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_TRANSPORTER */.H3,
   mixins: [normalize_slot/* normalizeSlotMixin */.Z],
   props: transporter_props,
@@ -4026,8 +4095,9 @@ var BVTransporterVue2 = /*#__PURE__*/(0,vue/* extend */.l7)({
         if ($container) {
           var $el = document.createElement('div');
           $container.appendChild($el);
-          this.$_target = (0,create_new_child_component/* createNewChildComponent */.H)(this, BVTransporterTarget, {
+          this.$_target = new BVTransporterTarget({
             el: $el,
+            parent: this,
             propsData: {
               // Initial nodes to be rendered
               nodes: (0,array/* concat */.zo)(this.normalizeSlot())
@@ -4077,33 +4147,14 @@ var BVTransporterVue2 = /*#__PURE__*/(0,vue/* extend */.l7)({
     return h();
   }
 });
-var BVTransporterVue3 = /*#__PURE__*/(0,vue/* extend */.l7)({
-  name: components/* NAME_TRANSPORTER */.H3,
-  mixins: [normalize_slot/* normalizeSlotMixin */.Z],
-  props: transporter_props,
-  render: function render(h) {
-    if (this.disabled) {
-      var $nodes = (0,array/* concat */.zo)(this.normalizeSlot()).filter(identity/* identity */.y);
-
-      if ($nodes.length > 0) {
-        return $nodes[0];
-      }
-    }
-
-    return h((external_commonjs_vue_commonjs2_vue_root_Vue_default()).Teleport, {
-      to: this.container
-    }, this.normalizeSlot());
-  }
-});
-var BVTransporter = vue/* isVue3 */.$B ? BVTransporterVue3 : BVTransporterVue2;
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/bv-event.class.js
 var bv_event_class = __webpack_require__(4895);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/modal/helpers/bv-modal-event.class.js
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function bv_modal_event_class_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function bv_modal_event_class_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function bv_modal_event_class_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? bv_modal_event_class_ownKeys(Object(source), !0).forEach(function (key) { bv_modal_event_class_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : bv_modal_event_class_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function bv_modal_event_class_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { bv_modal_event_class_ownKeys(Object(source), true).forEach(function (key) { bv_modal_event_class_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { bv_modal_event_class_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function bv_modal_event_class_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -4111,23 +4162,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _get() { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(arguments.length < 3 ? target : receiver); } return desc.value; }; } return _get.apply(this, arguments); }
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -4179,6 +4230,7 @@ var number = __webpack_require__(1917);
 
 
 
+
  // --- Constants ---
 // Default modal backdrop z-index
 
@@ -4189,7 +4241,7 @@ var SELECTOR_STICKY_CONTENT = '.sticky-top';
 var SELECTOR_NAVBAR_TOGGLER = '.navbar-toggler'; // --- Main component ---
 // @vue/component
 
-var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
+var ModalManager = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   data: function data() {
     return {
       modals: [],
@@ -4237,9 +4289,15 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
   methods: {
     // Public methods
     registerModal: function registerModal(modal) {
+      var _this2 = this;
+
       // Register the modal if not already registered
       if (modal && this.modals.indexOf(modal) === -1) {
+        // Add modal to modals array
         this.modals.push(modal);
+        modal.$once(events/* HOOK_EVENT_NAME_BEFORE_DESTROY */.vl, function () {
+          _this2.unregisterModal(modal);
+        });
       }
     },
     unregisterModal: function unregisterModal(modal) {
@@ -4249,13 +4307,13 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
         // Remove modal from modals array
         this.modals.splice(index, 1); // Reset the modal's data
 
-        if (!modal._isBeingDestroyed && !modal._isDestroyed) {
+        if (!(modal._isBeingDestroyed || modal._isDestroyed)) {
           this.resetModal(modal);
         }
       }
     },
     getBaseZIndex: function getBaseZIndex() {
-      if (env/* IS_BROWSER */.Qg && (0,inspect/* isNull */.Ft)(this.baseZIndex)) {
+      if ((0,inspect/* isNull */.Ft)(this.baseZIndex) && env/* IS_BROWSER */.Qg) {
         // Create a temporary `div.modal-backdrop` to get computed z-index
         var div = document.createElement('div');
         (0,dom/* addClass */.cn)(div, 'modal-backdrop');
@@ -4269,7 +4327,7 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
       return this.baseZIndex || DEFAULT_ZINDEX;
     },
     getScrollbarWidth: function getScrollbarWidth() {
-      if (env/* IS_BROWSER */.Qg && (0,inspect/* isNull */.Ft)(this.scrollbarWidth)) {
+      if ((0,inspect/* isNull */.Ft)(this.scrollbarWidth) && env/* IS_BROWSER */.Qg) {
         // Create a temporary `div.measure-scrollbar` to get computed z-index
         var div = document.createElement('div');
         (0,dom/* addClass */.cn)(div, 'modal-scrollbar-measure');
@@ -4282,7 +4340,7 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
     },
     // Private methods
     updateModals: function updateModals(modals) {
-      var _this2 = this;
+      var _this3 = this;
 
       var baseZIndex = this.getBaseZIndex();
       var scrollbarWidth = this.getScrollbarWidth();
@@ -4290,8 +4348,8 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
         // We update data values on each modal
         modal.zIndex = baseZIndex + index;
         modal.scrollbarWidth = scrollbarWidth;
-        modal.isTop = index === _this2.modals.length - 1;
-        modal.isBodyOverflowing = _this2.isBodyOverflowing;
+        modal.isTop = index === _this3.modals.length - 1;
+        modal.isBodyOverflowing = _this3.isBodyOverflowing;
       });
     },
     resetModal: function resetModal(modal) {
@@ -4397,9 +4455,9 @@ var ModalManager = /*#__PURE__*/(0,vue/* extend */.l7)({
 
 var modalManager = new ModalManager();
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/modal/modal.js
-function modal_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function modal_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function modal_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? modal_ownKeys(Object(source), !0).forEach(function (key) { modal_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : modal_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function modal_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { modal_ownKeys(Object(source), true).forEach(function (key) { modal_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { modal_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function modal_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -4486,7 +4544,6 @@ var modal_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sort
   footerBgVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   footerBorderVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   footerClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_ARRAY_OBJECT_STRING */.wA),
-  footerTag: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, 'footer'),
   footerTextVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   headerBgVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   headerBorderVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
@@ -4494,7 +4551,6 @@ var modal_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sort
   headerCloseContent: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, '&times;'),
   headerCloseLabel: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, 'Close'),
   headerCloseVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
-  headerTag: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, 'header'),
   headerTextVariant: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0),
   // TODO: Rename to `noBackdrop` and deprecate `hideBackdrop`
   hideBackdrop: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
@@ -4530,7 +4586,7 @@ var modal_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sort
 })), components/* NAME_MODAL */.zB); // --- Main component ---
 // @vue/component
 
-var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BModal = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_MODAL */.zB,
   mixins: [attrs/* attrsMixin */.D, id/* idMixin */.t, modelMixin, listenOnDocumentMixin, listen_on_root/* listenOnRootMixin */.E, listenOnWindowMixin, normalize_slot/* normalizeSlotMixin */.Z, scoped_style/* scopedStyleMixin */.o],
   inheritAttrs: false,
@@ -4698,7 +4754,6 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
   },
   beforeDestroy: function beforeDestroy() {
     // Ensure everything is back to normal
-    modalManager.unregisterModal(this);
     this.setObserver(false);
 
     if (this.isVisible) {
@@ -4762,12 +4817,12 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
       this.isOpening = true; // Set the element to return focus to when closed
 
       this.$_returnFocus = this.$_returnFocus || this.getActiveElement();
-      var showEvent = this.buildEvent(events/* EVENT_NAME_SHOW */.l0, {
+      var showEvt = this.buildEvent(events/* EVENT_NAME_SHOW */.l0, {
         cancelable: true
       });
-      this.emitEvent(showEvent); // Don't show if canceled
+      this.emitEvent(showEvt); // Don't show if canceled
 
-      if (showEvent.defaultPrevented || this.isVisible) {
+      if (showEvt.defaultPrevented || this.isVisible) {
         this.isOpening = false; // Ensure the v-model reflects the current state
 
         this.updateModel(false);
@@ -4787,22 +4842,22 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
       }
 
       this.isClosing = true;
-      var hideEvent = this.buildEvent(events/* EVENT_NAME_HIDE */.yM, {
+      var hideEvt = this.buildEvent(events/* EVENT_NAME_HIDE */.yM, {
         cancelable: trigger !== TRIGGER_FORCE,
         trigger: trigger || null
       }); // We emit specific event for one of the three built-in buttons
 
       if (trigger === BUTTON_OK) {
-        this.$emit(events/* EVENT_NAME_OK */.Et, hideEvent);
+        this.$emit(events/* EVENT_NAME_OK */.Et, hideEvt);
       } else if (trigger === BUTTON_CANCEL) {
-        this.$emit(events/* EVENT_NAME_CANCEL */.J9, hideEvent);
+        this.$emit(events/* EVENT_NAME_CANCEL */.J9, hideEvt);
       } else if (trigger === BUTTON_CLOSE) {
-        this.$emit(events/* EVENT_NAME_CLOSE */.Cc, hideEvent);
+        this.$emit(events/* EVENT_NAME_CLOSE */.Cc, hideEvt);
       }
 
-      this.emitEvent(hideEvent); // Hide if not canceled
+      this.emitEvent(hideEvt); // Hide if not canceled
 
-      if (hideEvent.defaultPrevented || !this.isVisible) {
+      if (hideEvt.defaultPrevented || !this.isVisible) {
         this.isClosing = false; // Ensure v-model reflects current state
 
         this.updateModel(true);
@@ -5160,7 +5215,7 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
           this.normalizeSlot(slots/* SLOT_NAME_MODAL_TITLE */.Ro, this.slotScope)), $closeButton];
         }
 
-        $header = h(this.headerTag, {
+        $header = h('header', {
           staticClass: 'modal-header',
           class: this.headerClasses,
           attrs: {
@@ -5223,7 +5278,7 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
           $modalFooter = [$cancelButton, $okButton];
         }
 
-        $footer = h(this.footerTag, {
+        $footer = h('footer', {
           staticClass: 'modal-footer',
           class: this.footerClasses,
           attrs: {
@@ -5344,16 +5399,7 @@ var BModal = /*#__PURE__*/(0,vue/* extend */.l7)({
     }
   }
 });
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/get-event-root.js
-var get_event_root = __webpack_require__(8887);
-;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/get-instance-from-directive.js
-
-var getInstanceFromDirective = function getInstanceFromDirective(vnode, bindings) {
-  return vue/* isVue3 */.$B ? bindings.instance : vnode.context;
-};
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/directives/modal/modal.js
-
-
 
 
 
@@ -5410,7 +5456,7 @@ var bind = function bind(el, binding, vnode) {
         var key = event.keyCode; // Open modal only if trigger is not disabled
 
         if (type === 'click' || type === 'keydown' && (key === CODE_ENTER || key === CODE_SPACE)) {
-          (0,get_event_root/* getEventRoot */.C)(getInstanceFromDirective(vnode, binding)).$emit(ROOT_ACTION_EVENT_NAME_SHOW, target, currentTarget);
+          vnode.context.$root.$emit(ROOT_ACTION_EVENT_NAME_SHOW, target, currentTarget);
         }
       }
     };
@@ -5476,8 +5522,6 @@ var VBModal = {
   componentUpdated: componentUpdated,
   unbind: unbind
 };
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/use-parent.js
-var use_parent = __webpack_require__(1403);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/config.js + 1 modules
 var config = __webpack_require__(2334);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/plugins.js + 2 modules
@@ -5487,11 +5531,11 @@ function bv_modal_classCallCheck(instance, Constructor) { if (!(instance instanc
 
 function bv_modal_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function bv_modal_createClass(Constructor, protoProps, staticProps) { if (protoProps) bv_modal_defineProperties(Constructor.prototype, protoProps); if (staticProps) bv_modal_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function bv_modal_createClass(Constructor, protoProps, staticProps) { if (protoProps) bv_modal_defineProperties(Constructor.prototype, protoProps); if (staticProps) bv_modal_defineProperties(Constructor, staticProps); return Constructor; }
 
-function bv_modal_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function bv_modal_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function bv_modal_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? bv_modal_ownKeys(Object(source), !0).forEach(function (key) { bv_modal_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : bv_modal_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function bv_modal_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { bv_modal_ownKeys(Object(source), true).forEach(function (key) { bv_modal_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { bv_modal_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function bv_modal_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -5501,16 +5545,13 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 // Plugin for adding `$bvModal` property to all Vue instances
-
-
-
 
 
 
@@ -5560,7 +5601,6 @@ var bv_modal_plugin = function plugin(Vue) {
   var BMsgBox = Vue.extend({
     name: components/* NAME_MSG_BOX */.Au,
     extends: BModal,
-    mixins: [use_parent/* useParentMixin */.S],
     destroyed: function destroyed() {
       // Make sure we not in document any more
       if (this.$el && this.$el.parentNode) {
@@ -5581,7 +5621,7 @@ var bv_modal_plugin = function plugin(Vue) {
       }; // Self destruct if parent destroyed
 
 
-      this.bvParent.$once(events/* HOOK_EVENT_NAME_DESTROYED */.DJ, handleDestroy); // Self destruct after hidden
+      this.$parent.$once(events/* HOOK_EVENT_NAME_DESTROYED */.DJ, handleDestroy); // Self destruct after hidden
 
       this.$once(events/* EVENT_NAME_HIDDEN */.v6, handleDestroy); // Self destruct on route change
 
@@ -5600,19 +5640,20 @@ var bv_modal_plugin = function plugin(Vue) {
   }); // Method to generate the on-demand modal message box
   // Returns a promise that resolves to a value returned by the resolve
 
-  var asyncMsgBox = function asyncMsgBox(parent, props) {
+  var asyncMsgBox = function asyncMsgBox($parent, props) {
     var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
 
     if ((0,warn/* warnNotClient */.zl)(PROP_NAME) || (0,warn/* warnNoPromiseSupport */.gs)(PROP_NAME)) {
       /* istanbul ignore next */
       return;
     } // Create an instance of `BMsgBox` component
-    // We set parent as the local VM so these modals can emit events on
-    // the app `$root`, as needed by things like tooltips and popovers
-    // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
 
 
-    var msgBox = (0,create_new_child_component/* createNewChildComponent */.H)(parent, BMsgBox, {
+    var msgBox = new BMsgBox({
+      // We set parent as the local VM so these modals can emit events on
+      // the app `$root`, as needed by things like tooltips and popovers
+      // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
+      parent: $parent,
       // Preset the prop values
       propsData: bv_modal_objectSpread(bv_modal_objectSpread(bv_modal_objectSpread({}, filterOptions((0,config/* getComponentConfig */.wJ)(components/* NAME_MODAL */.zB))), {}, {
         // Defaults that user can override
@@ -5644,11 +5685,11 @@ var bv_modal_plugin = function plugin(Vue) {
           reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
         }
       });
-      msgBox.$on(events/* EVENT_NAME_HIDE */.yM, function (bvModalEvent) {
-        if (!bvModalEvent.defaultPrevented) {
-          var result = resolver(bvModalEvent); // If resolver didn't cancel hide, we resolve
+      msgBox.$on(events/* EVENT_NAME_HIDE */.yM, function (bvModalEvt) {
+        if (!bvModalEvt.defaultPrevented) {
+          var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
 
-          if (!bvModalEvent.defaultPrevented) {
+          if (!bvModalEvt.defaultPrevented) {
             resolved = true;
             resolve(result);
           }
@@ -5663,7 +5704,7 @@ var bv_modal_plugin = function plugin(Vue) {
   // Not to be used directly by consumers, as this method may change calling syntax
 
 
-  var makeMsgBox = function makeMsgBox(parent, content) {
+  var makeMsgBox = function makeMsgBox($parent, content) {
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var resolver = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
@@ -5672,7 +5713,7 @@ var bv_modal_plugin = function plugin(Vue) {
       return;
     }
 
-    return asyncMsgBox(parent, bv_modal_objectSpread(bv_modal_objectSpread({}, filterOptions(options)), {}, {
+    return asyncMsgBox($parent, bv_modal_objectSpread(bv_modal_objectSpread({}, filterOptions(options)), {}, {
       msgBoxContent: content
     }), resolver);
   }; // BvModal instance class
@@ -5685,7 +5726,7 @@ var bv_modal_plugin = function plugin(Vue) {
       // Assign the new properties to this instance
       (0,object/* assign */.f0)(this, {
         _vm: vm,
-        _root: (0,get_event_root/* getEventRoot */.C)(vm)
+        _root: vm.$root
       }); // Set these properties as read-only and non-enumerable
 
       (0,object/* defineProperties */.hc)(this, {
@@ -5762,8 +5803,8 @@ var bv_modal_plugin = function plugin(Vue) {
           hideFooter: false
         });
 
-        return makeMsgBox(this._vm, message, props, function (bvModalEvent) {
-          var trigger = bvModalEvent.trigger;
+        return makeMsgBox(this._vm, message, props, function (bvModalEvt) {
+          var trigger = bvModalEvt.trigger;
           return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
         });
       }
@@ -5829,15 +5870,13 @@ var ModalPlugin = /*#__PURE__*/(0,plugins/* pluginFactory */.Hr)({
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  p: () => (/* binding */ BVToastPlugin)
+  "p": () => (/* binding */ BVToastPlugin)
 });
 
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/components.js
 var components = __webpack_require__(7825);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/events.js
 var events = __webpack_require__(4196);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/use-parent.js
-var use_parent = __webpack_require__(1403);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/array.js
 var array = __webpack_require__(1721);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/config.js + 1 modules
@@ -5854,12 +5893,11 @@ var object = __webpack_require__(6819);
 var plugins = __webpack_require__(2330);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/warn.js + 1 modules
 var warn = __webpack_require__(4760);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/create-new-child-component.js
-var create_new_child_component = __webpack_require__(2705);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/get-event-root.js
-var get_event_root = __webpack_require__(8887);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/portal-vue/dist/portal-vue.common.js
 var portal_vue_common = __webpack_require__(1525);
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
 var vue = __webpack_require__(7137);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/props.js
@@ -5883,8 +5921,8 @@ var model = __webpack_require__(7193);
 var number = __webpack_require__(1917);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/props.js
 var utils_props = __webpack_require__(3194);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js + 1 modules
-var router = __webpack_require__(1955);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js
+var router = __webpack_require__(9022);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/attrs.js
 var attrs = __webpack_require__(6741);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/id.js
@@ -5915,7 +5953,7 @@ var bv_transition = __webpack_require__(185);
  // --- Helper components ---
 // @vue/component
 
-var DefaultTransition = /*#__PURE__*/(0,vue/* extend */.l7)({
+var DefaultTransition = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   mixins: [normalize_slot/* normalizeSlotMixin */.Z],
   data: function data() {
     return {
@@ -5961,7 +5999,7 @@ var toaster_props = (0,utils_props/* makePropsConfigurable */.y2)({
 }, components/* NAME_TOASTER */.Gi); // --- Main component ---
 // @vue/component
 
-var BToaster = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BToaster = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_TOASTER */.Gi,
   mixins: [listen_on_root/* listenOnRootMixin */.E],
   props: toaster_props,
@@ -5975,22 +6013,22 @@ var BToaster = /*#__PURE__*/(0,vue/* extend */.l7)({
     };
   },
   beforeMount: function beforeMount() {
+    var _this2 = this;
+
     var name = this.name;
     this.staticName = name;
     /* istanbul ignore if */
 
-    if (portal_vue_common/* Wormhole */.Df.hasTarget(name)) {
+    if (portal_vue_common/* Wormhole.hasTarget */.Df.hasTarget(name)) {
       (0,warn/* warn */.ZK)("A \"<portal-target>\" with name \"".concat(name, "\" already exists in the document."), components/* NAME_TOASTER */.Gi);
       this.dead = true;
     } else {
       this.doRender = true;
-    }
-  },
-  beforeDestroy: function beforeDestroy() {
-    // Let toasts made with `this.$bvToast.toast()` know that this toaster
-    // is being destroyed and should should also destroy/hide themselves
-    if (this.doRender) {
-      this.emitOnRoot((0,utils_events/* getRootEventName */.J3)(components/* NAME_TOASTER */.Gi, events/* EVENT_NAME_DESTROYED */.Vz), this.name);
+      this.$once(events/* HOOK_EVENT_NAME_BEFORE_DESTROY */.vl, function () {
+        // Let toasts made with `this.$bvToast.toast()` know that this toaster
+        // is being destroyed and should should also destroy/hide themselves
+        _this2.emitOnRoot((0,utils_events/* getRootEventName */.J3)(components/* NAME_TOASTER */.Gi, events/* EVENT_NAME_DESTROYED */.Vz), name);
+      });
     }
   },
   destroyed: function destroyed() {
@@ -6040,12 +6078,11 @@ var BToaster = /*#__PURE__*/(0,vue/* extend */.l7)({
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/toast/toast.js
 var _watch;
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 
 
 
@@ -6090,7 +6127,6 @@ var toast_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sort
   autoHideDelay: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_NUMBER_STRING */.fE, 5000),
   bodyClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_ARRAY_OBJECT_STRING */.wA),
   headerClass: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_ARRAY_OBJECT_STRING */.wA),
-  headerTag: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_STRING */.N0, 'header'),
   // Switches role to 'status' and aria-live to 'polite'
   isStatus: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
   noAutoHide: (0,utils_props/* makeProp */.pi)(props/* PROP_TYPE_BOOLEAN */.U5, false),
@@ -6107,7 +6143,7 @@ var toast_props = (0,utils_props/* makePropsConfigurable */.y2)((0,object/* sort
 })), components/* NAME_TOAST */.Tf); // --- Main component ---
 // @vue/component
 
-var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
+var BToast = /*#__PURE__*/external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   name: components/* NAME_TOAST */.Tf,
   mixins: [attrs/* attrsMixin */.D, id/* idMixin */.t, modelMixin, listen_on_root/* listenOnRootMixin */.E, normalize_slot/* normalizeSlotMixin */.Z, scoped_style/* scopedStyleMixin */.o],
   inheritAttrs: false,
@@ -6224,8 +6260,8 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
 
       if (!this.localShow) {
         this.ensureToaster();
-        var showEvent = this.buildEvent(events/* EVENT_NAME_SHOW */.l0);
-        this.emitEvent(showEvent);
+        var showEvt = this.buildEvent(events/* EVENT_NAME_SHOW */.l0);
+        this.emitEvent(showEvt);
         this.dismissStarted = this.resumeDismiss = 0;
         this.order = Date.now() * (this.appendToast ? 1 : -1);
         this.isHiding = false;
@@ -6243,8 +6279,8 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
       var _this3 = this;
 
       if (this.localShow) {
-        var hideEvent = this.buildEvent(events/* EVENT_NAME_HIDE */.yM);
-        this.emitEvent(hideEvent);
+        var hideEvt = this.buildEvent(events/* EVENT_NAME_HIDE */.yM);
+        this.emitEvent(hideEvt);
         this.setHoverHandler(false);
         this.dismissStarted = this.resumeDismiss = 0;
         this.clearDismissTimer();
@@ -6277,10 +6313,11 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
 
       var computedToaster = this.computedToaster;
 
-      if (!portal_vue_common/* Wormhole */.Df.hasTarget(computedToaster)) {
+      if (!portal_vue_common/* Wormhole.hasTarget */.Df.hasTarget(computedToaster)) {
         var div = document.createElement('div');
         document.body.appendChild(div);
-        var toaster = (0,create_new_child_component/* createNewChildComponent */.H)(this.bvEventRoot, BToaster, {
+        var toaster = new BToaster({
+          parent: this.$root,
           propsData: {
             name: computedToaster
           }
@@ -6344,8 +6381,8 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
     },
     onAfterEnter: function onAfterEnter() {
       this.isTransitioning = false;
-      var hiddenEvent = this.buildEvent(events/* EVENT_NAME_SHOWN */.AS);
-      this.emitEvent(hiddenEvent);
+      var hiddenEvt = this.buildEvent(events/* EVENT_NAME_SHOWN */.AS);
+      this.emitEvent(hiddenEvt);
       this.startDismissTimer();
       this.setHoverHandler(true);
     },
@@ -6356,8 +6393,8 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
       this.isTransitioning = false;
       this.order = 0;
       this.resumeDismiss = this.dismissStarted = 0;
-      var hiddenEvent = this.buildEvent(events/* EVENT_NAME_HIDDEN */.v6);
-      this.emitEvent(hiddenEvent);
+      var hiddenEvt = this.buildEvent(events/* EVENT_NAME_HIDDEN */.v6);
+      this.emitEvent(hiddenEvt);
       this.doRender = false;
     },
     // Render helper for generating the toast
@@ -6392,7 +6429,7 @@ var BToast = /*#__PURE__*/(0,vue/* extend */.l7)({
       var $header = h();
 
       if ($headerContent.length > 0) {
-        $header = h(this.headerTag, {
+        $header = h('header', {
           staticClass: 'toast-header',
           class: this.headerClass
         }, $headerContent);
@@ -6458,11 +6495,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function bv_toast_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function bv_toast_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function bv_toast_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? bv_toast_ownKeys(Object(source), !0).forEach(function (key) { bv_toast_defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : bv_toast_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function bv_toast_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { bv_toast_ownKeys(Object(source), true).forEach(function (key) { bv_toast_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { bv_toast_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function bv_toast_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -6472,7 +6509,7 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
@@ -6481,9 +6518,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 /**
  * Plugin for adding `$bvToast` property to all Vue instances
  */
-
-
-
 
 
 
@@ -6528,7 +6562,6 @@ var bv_toast_plugin = function plugin(Vue) {
   var BVToastPop = Vue.extend({
     name: components/* NAME_TOAST_POP */.v0,
     extends: BToast,
-    mixins: [use_parent/* useParentMixin */.S],
     destroyed: function destroyed() {
       // Make sure we not in document any more
       var $el = this.$el;
@@ -6558,7 +6591,7 @@ var bv_toast_plugin = function plugin(Vue) {
       }; // Self destruct if parent destroyed
 
 
-      this.bvParent.$once(events/* HOOK_EVENT_NAME_DESTROYED */.DJ, handleDestroy); // Self destruct after hidden
+      this.$parent.$once(events/* HOOK_EVENT_NAME_DESTROYED */.DJ, handleDestroy); // Self destruct after hidden
 
       this.$once(events/* EVENT_NAME_HIDDEN */.v6, handleDestroy); // Self destruct when toaster is destroyed
 
@@ -6571,16 +6604,17 @@ var bv_toast_plugin = function plugin(Vue) {
     }
   }); // Private method to generate the on-demand toast
 
-  var makeToast = function makeToast(props, parent) {
+  var makeToast = function makeToast(props, $parent) {
     if ((0,warn/* warnNotClient */.zl)(PROP_NAME)) {
       /* istanbul ignore next */
       return;
     } // Create an instance of `BVToastPop` component
 
 
-    var toast = (0,create_new_child_component/* createNewChildComponent */.H)(parent, BVToastPop, {
+    var toast = new BVToastPop({
       // We set parent as the local VM so these toasts can emit events on the
       // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
+      parent: $parent,
       propsData: bv_toast_objectSpread(bv_toast_objectSpread(bv_toast_objectSpread({}, filterOptions((0,config/* getComponentConfig */.wJ)(components/* NAME_TOAST */.Tf))), (0,object/* omit */.CE)(props, (0,object/* keys */.XP)(propsToSlots))), {}, {
         // Props that can't be overridden
         static: false,
@@ -6595,7 +6629,7 @@ var bv_toast_plugin = function plugin(Vue) {
         // Can be a string, or array of VNodes
         if (prop === 'title' && (0,inspect/* isString */.HD)(value)) {
           // Special case for title if it is a string, we wrap in a <strong>
-          value = [parent.$createElement('strong', {
+          value = [$parent.$createElement('strong', {
             class: 'mr-2'
           }, value)];
         }
@@ -6617,7 +6651,7 @@ var bv_toast_plugin = function plugin(Vue) {
       // Assign the new properties to this instance
       (0,object/* assign */.f0)(this, {
         _vm: vm,
-        _root: (0,get_event_root/* getEventRoot */.C)(vm)
+        _root: vm.$root
       }); // Set these properties as read-only and non-enumerable
 
       (0,object/* defineProperties */.hc)(this, {
@@ -6700,18 +6734,19 @@ var BVToastPlugin = /*#__PURE__*/(0,plugins/* pluginFactory */.Hr)({
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   N: () => (/* binding */ BVTransition)
+/* harmony export */   "N": () => (/* binding */ BVTransition)
 /* harmony export */ });
 /* unused harmony export props */
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7137);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2491);
 /* harmony import */ var _constants_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7825);
 /* harmony import */ var _constants_props__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3022);
 /* harmony import */ var _utils_inspect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6498);
 /* harmony import */ var _utils_props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3194);
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -6755,7 +6790,7 @@ var props = {
 }; // --- Main component ---
 // @vue/component
 
-var BVTransition = /*#__PURE__*/(0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend */ .l7)({
+var BVTransition = /*#__PURE__*/_vue__WEBPACK_IMPORTED_MODULE_2___default().extend({
   name: _constants_components__WEBPACK_IMPORTED_MODULE_3__/* .NAME_TRANSITION */ .X_,
   functional: true,
   props: props,
@@ -6785,12 +6820,8 @@ var BVTransition = /*#__PURE__*/(0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend *
       // We always need `css` true
       css: true
     });
-
-    var dataCopy = _objectSpread({}, data);
-
-    delete dataCopy.props;
     return h('transition', // Any transition event listeners will get merged here
-    (0,_vue__WEBPACK_IMPORTED_MODULE_5__/* .mergeData */ .b)(dataCopy, {
+    (0,_vue__WEBPACK_IMPORTED_MODULE_5__/* .mergeData */ .b)(data, {
       props: transProps
     }), children);
   }
@@ -6803,17 +6834,17 @@ var BVTransition = /*#__PURE__*/(0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend *
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Au: () => (/* binding */ NAME_MSG_BOX),
-/* harmony export */   Gi: () => (/* binding */ NAME_TOASTER),
-/* harmony export */   H3: () => (/* binding */ NAME_TRANSPORTER),
-/* harmony export */   MZ: () => (/* binding */ NAME_BUTTON),
-/* harmony export */   Tf: () => (/* binding */ NAME_TOAST),
-/* harmony export */   X_: () => (/* binding */ NAME_TRANSITION),
-/* harmony export */   eO: () => (/* binding */ NAME_TRANSPORTER_TARGET),
-/* harmony export */   gi: () => (/* binding */ NAME_BUTTON_CLOSE),
-/* harmony export */   v0: () => (/* binding */ NAME_TOAST_POP),
-/* harmony export */   wE: () => (/* binding */ NAME_LINK),
-/* harmony export */   zB: () => (/* binding */ NAME_MODAL)
+/* harmony export */   "Au": () => (/* binding */ NAME_MSG_BOX),
+/* harmony export */   "Gi": () => (/* binding */ NAME_TOASTER),
+/* harmony export */   "H3": () => (/* binding */ NAME_TRANSPORTER),
+/* harmony export */   "MZ": () => (/* binding */ NAME_BUTTON),
+/* harmony export */   "Tf": () => (/* binding */ NAME_TOAST),
+/* harmony export */   "X_": () => (/* binding */ NAME_TRANSITION),
+/* harmony export */   "eO": () => (/* binding */ NAME_TRANSPORTER_TARGET),
+/* harmony export */   "gi": () => (/* binding */ NAME_BUTTON_CLOSE),
+/* harmony export */   "v0": () => (/* binding */ NAME_TOAST_POP),
+/* harmony export */   "wE": () => (/* binding */ NAME_LINK),
+/* harmony export */   "zB": () => (/* binding */ NAME_MODAL)
 /* harmony export */ });
 /* unused harmony exports NAME_ALERT, NAME_ASPECT, NAME_AVATAR, NAME_AVATAR_GROUP, NAME_BADGE, NAME_BREADCRUMB, NAME_BREADCRUMB_ITEM, NAME_BREADCRUMB_LINK, NAME_BUTTON_GROUP, NAME_BUTTON_TOOLBAR, NAME_CALENDAR, NAME_CARD, NAME_CARD_BODY, NAME_CARD_FOOTER, NAME_CARD_GROUP, NAME_CARD_HEADER, NAME_CARD_IMG, NAME_CARD_IMG_LAZY, NAME_CARD_SUB_TITLE, NAME_CARD_TEXT, NAME_CARD_TITLE, NAME_CAROUSEL, NAME_CAROUSEL_SLIDE, NAME_COL, NAME_COLLAPSE, NAME_CONTAINER, NAME_DROPDOWN, NAME_DROPDOWN_DIVIDER, NAME_DROPDOWN_FORM, NAME_DROPDOWN_GROUP, NAME_DROPDOWN_HEADER, NAME_DROPDOWN_ITEM, NAME_DROPDOWN_ITEM_BUTTON, NAME_DROPDOWN_TEXT, NAME_EMBED, NAME_FORM, NAME_FORM_CHECKBOX, NAME_FORM_CHECKBOX_GROUP, NAME_FORM_DATALIST, NAME_FORM_DATEPICKER, NAME_FORM_FILE, NAME_FORM_GROUP, NAME_FORM_INPUT, NAME_FORM_INVALID_FEEDBACK, NAME_FORM_RADIO, NAME_FORM_RADIO_GROUP, NAME_FORM_RATING, NAME_FORM_ROW, NAME_FORM_SELECT, NAME_FORM_SELECT_OPTION, NAME_FORM_SELECT_OPTION_GROUP, NAME_FORM_SPINBUTTON, NAME_FORM_TAG, NAME_FORM_TAGS, NAME_FORM_TEXT, NAME_FORM_TEXTAREA, NAME_FORM_TIMEPICKER, NAME_FORM_VALID_FEEDBACK, NAME_ICON, NAME_ICONSTACK, NAME_ICON_BASE, NAME_IMG, NAME_IMG_LAZY, NAME_INPUT_GROUP, NAME_INPUT_GROUP_ADDON, NAME_INPUT_GROUP_APPEND, NAME_INPUT_GROUP_PREPEND, NAME_INPUT_GROUP_TEXT, NAME_JUMBOTRON, NAME_LIST_GROUP, NAME_LIST_GROUP_ITEM, NAME_MEDIA, NAME_MEDIA_ASIDE, NAME_MEDIA_BODY, NAME_NAV, NAME_NAVBAR, NAME_NAVBAR_BRAND, NAME_NAVBAR_NAV, NAME_NAVBAR_TOGGLE, NAME_NAV_FORM, NAME_NAV_ITEM, NAME_NAV_ITEM_DROPDOWN, NAME_NAV_TEXT, NAME_OVERLAY, NAME_PAGINATION, NAME_PAGINATION_NAV, NAME_POPOVER, NAME_PROGRESS, NAME_PROGRESS_BAR, NAME_ROW, NAME_SIDEBAR, NAME_SKELETON, NAME_SKELETON_ICON, NAME_SKELETON_IMG, NAME_SKELETON_TABLE, NAME_SKELETON_WRAPPER, NAME_SPINNER, NAME_TAB, NAME_TABLE, NAME_TABLE_CELL, NAME_TABLE_LITE, NAME_TABLE_SIMPLE, NAME_TABS, NAME_TBODY, NAME_TFOOT, NAME_TH, NAME_THEAD, NAME_TIME, NAME_TOOLTIP, NAME_TR, NAME_COLLAPSE_HELPER, NAME_FORM_BUTTON_LABEL_CONTROL, NAME_FORM_RATING_STAR, NAME_POPOVER_HELPER, NAME_POPOVER_TEMPLATE, NAME_POPPER, NAME_TAB_BUTTON_HELPER, NAME_TOOLTIP_HELPER, NAME_TOOLTIP_TEMPLATE */
 // Component names
@@ -6956,9 +6987,9 @@ var NAME_TRANSPORTER_TARGET = 'BVTransporterTarget';
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A1: () => (/* binding */ NAME),
-/* harmony export */   JJ: () => (/* binding */ DEFAULT_BREAKPOINT),
-/* harmony export */   KB: () => (/* binding */ PROP_NAME)
+/* harmony export */   "A1": () => (/* binding */ NAME),
+/* harmony export */   "JJ": () => (/* binding */ DEFAULT_BREAKPOINT),
+/* harmony export */   "KB": () => (/* binding */ PROP_NAME)
 /* harmony export */ });
 var NAME = 'BvConfig';
 var PROP_NAME = '$bvConfig';
@@ -6971,14 +7002,14 @@ var DEFAULT_BREAKPOINT = ['xs', 'sm', 'md', 'lg', 'xl'];
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   GA: () => (/* binding */ HAS_PASSIVE_EVENT_SUPPORT),
-/* harmony export */   K0: () => (/* binding */ DOCUMENT),
-/* harmony export */   Qg: () => (/* binding */ IS_BROWSER),
-/* harmony export */   Uc: () => (/* binding */ HAS_MUTATION_OBSERVER_SUPPORT),
-/* harmony export */   dV: () => (/* binding */ HAS_WINDOW_SUPPORT),
-/* harmony export */   m9: () => (/* binding */ WINDOW),
-/* harmony export */   sJ: () => (/* binding */ IS_JSDOM),
-/* harmony export */   zx: () => (/* binding */ HAS_PROMISE_SUPPORT)
+/* harmony export */   "GA": () => (/* binding */ HAS_PASSIVE_EVENT_SUPPORT),
+/* harmony export */   "K0": () => (/* binding */ DOCUMENT),
+/* harmony export */   "Qg": () => (/* binding */ IS_BROWSER),
+/* harmony export */   "Uc": () => (/* binding */ HAS_MUTATION_OBSERVER_SUPPORT),
+/* harmony export */   "dV": () => (/* binding */ HAS_WINDOW_SUPPORT),
+/* harmony export */   "m9": () => (/* binding */ WINDOW),
+/* harmony export */   "sJ": () => (/* binding */ IS_JSDOM),
+/* harmony export */   "zx": () => (/* binding */ HAS_PROMISE_SUPPORT)
 /* harmony export */ });
 /* unused harmony exports HAS_DOCUMENT_SUPPORT, HAS_NAVIGATOR_SUPPORT, NAVIGATOR, USER_AGENT, IS_IE, HAS_TOUCH_SUPPORT, HAS_POINTER_EVENT_SUPPORT, HAS_INTERACTION_OBSERVER_SUPPORT */
 var HAS_WINDOW_SUPPORT = typeof window !== 'undefined';
@@ -7036,28 +7067,26 @@ var HAS_INTERACTION_OBSERVER_SUPPORT = IS_BROWSER && 'IntersectionObserver' in W
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   AS: () => (/* binding */ EVENT_NAME_SHOWN),
-/* harmony export */   Cc: () => (/* binding */ EVENT_NAME_CLOSE),
-/* harmony export */   DJ: () => (/* binding */ HOOK_EVENT_NAME_DESTROYED),
-/* harmony export */   Ep: () => (/* binding */ EVENT_NAME_TOGGLE),
-/* harmony export */   Et: () => (/* binding */ EVENT_NAME_OK),
-/* harmony export */   HH: () => (/* binding */ ROOT_EVENT_NAME_PREFIX),
-/* harmony export */   IJ: () => (/* binding */ EVENT_OPTIONS_NO_CAPTURE),
-/* harmony export */   J9: () => (/* binding */ EVENT_NAME_CANCEL),
-/* harmony export */   JP: () => (/* binding */ ROOT_EVENT_NAME_SEPARATOR),
-/* harmony export */   PZ: () => (/* binding */ EVENT_NAME_CLICK),
-/* harmony export */   SH: () => (/* binding */ EVENT_OPTIONS_PASSIVE),
-/* harmony export */   Vz: () => (/* binding */ EVENT_NAME_DESTROYED),
-/* harmony export */   gn: () => (/* binding */ EVENT_NAME_INPUT),
-/* harmony export */   l0: () => (/* binding */ EVENT_NAME_SHOW),
-/* harmony export */   v6: () => (/* binding */ EVENT_NAME_HIDDEN),
-/* harmony export */   vl: () => (/* binding */ HOOK_EVENT_NAME_BEFORE_DESTROY),
-/* harmony export */   yM: () => (/* binding */ EVENT_NAME_HIDE),
-/* harmony export */   z2: () => (/* binding */ EVENT_NAME_CHANGE)
+/* harmony export */   "AS": () => (/* binding */ EVENT_NAME_SHOWN),
+/* harmony export */   "Cc": () => (/* binding */ EVENT_NAME_CLOSE),
+/* harmony export */   "DJ": () => (/* binding */ HOOK_EVENT_NAME_DESTROYED),
+/* harmony export */   "Ep": () => (/* binding */ EVENT_NAME_TOGGLE),
+/* harmony export */   "Et": () => (/* binding */ EVENT_NAME_OK),
+/* harmony export */   "HH": () => (/* binding */ ROOT_EVENT_NAME_PREFIX),
+/* harmony export */   "IJ": () => (/* binding */ EVENT_OPTIONS_NO_CAPTURE),
+/* harmony export */   "J9": () => (/* binding */ EVENT_NAME_CANCEL),
+/* harmony export */   "JP": () => (/* binding */ ROOT_EVENT_NAME_SEPARATOR),
+/* harmony export */   "PZ": () => (/* binding */ EVENT_NAME_CLICK),
+/* harmony export */   "SH": () => (/* binding */ EVENT_OPTIONS_PASSIVE),
+/* harmony export */   "Vz": () => (/* binding */ EVENT_NAME_DESTROYED),
+/* harmony export */   "gn": () => (/* binding */ EVENT_NAME_INPUT),
+/* harmony export */   "l0": () => (/* binding */ EVENT_NAME_SHOW),
+/* harmony export */   "v6": () => (/* binding */ EVENT_NAME_HIDDEN),
+/* harmony export */   "vl": () => (/* binding */ HOOK_EVENT_NAME_BEFORE_DESTROY),
+/* harmony export */   "yM": () => (/* binding */ EVENT_NAME_HIDE),
+/* harmony export */   "z2": () => (/* binding */ EVENT_NAME_CHANGE)
 /* harmony export */ });
-/* unused harmony exports EVENT_NAME_ACTIVATE_TAB, EVENT_NAME_BLUR, EVENT_NAME_CHANGED, EVENT_NAME_CONTEXT, EVENT_NAME_CONTEXT_CHANGED, EVENT_NAME_DISABLE, EVENT_NAME_DISABLED, EVENT_NAME_DISMISSED, EVENT_NAME_DISMISS_COUNT_DOWN, EVENT_NAME_ENABLE, EVENT_NAME_ENABLED, EVENT_NAME_FILTERED, EVENT_NAME_FIRST, EVENT_NAME_FOCUS, EVENT_NAME_FOCUSIN, EVENT_NAME_FOCUSOUT, EVENT_NAME_HEAD_CLICKED, EVENT_NAME_IMG_ERROR, EVENT_NAME_LAST, EVENT_NAME_MOUSEENTER, EVENT_NAME_MOUSELEAVE, EVENT_NAME_NEXT, EVENT_NAME_OPEN, EVENT_NAME_PAGE_CLICK, EVENT_NAME_PAUSED, EVENT_NAME_PREV, EVENT_NAME_REFRESH, EVENT_NAME_REFRESHED, EVENT_NAME_REMOVE, EVENT_NAME_ROW_CLICKED, EVENT_NAME_ROW_CONTEXTMENU, EVENT_NAME_ROW_DBLCLICKED, EVENT_NAME_ROW_HOVERED, EVENT_NAME_ROW_MIDDLE_CLICKED, EVENT_NAME_ROW_SELECTED, EVENT_NAME_ROW_UNHOVERED, EVENT_NAME_SELECTED, EVENT_NAME_SLIDING_END, EVENT_NAME_SLIDING_START, EVENT_NAME_SORT_CHANGED, EVENT_NAME_TAG_STATE, EVENT_NAME_UNPAUSED, EVENT_NAME_UPDATE, MODEL_EVENT_NAME_PREFIX */
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7137);
-
+/* unused harmony exports EVENT_NAME_ACTIVATE_TAB, EVENT_NAME_BLUR, EVENT_NAME_CHANGED, EVENT_NAME_CONTEXT, EVENT_NAME_CONTEXT_CHANGED, EVENT_NAME_DISABLE, EVENT_NAME_DISABLED, EVENT_NAME_DISMISSED, EVENT_NAME_DISMISS_COUNT_DOWN, EVENT_NAME_ENABLE, EVENT_NAME_ENABLED, EVENT_NAME_FILTERED, EVENT_NAME_FIRST, EVENT_NAME_FOCUSIN, EVENT_NAME_FOCUSOUT, EVENT_NAME_HEAD_CLICKED, EVENT_NAME_IMG_ERROR, EVENT_NAME_LAST, EVENT_NAME_MOUSEENTER, EVENT_NAME_MOUSELEAVE, EVENT_NAME_NEXT, EVENT_NAME_OPEN, EVENT_NAME_PAGE_CLICK, EVENT_NAME_PAUSED, EVENT_NAME_PREV, EVENT_NAME_REFRESH, EVENT_NAME_REFRESHED, EVENT_NAME_REMOVE, EVENT_NAME_ROW_CLICKED, EVENT_NAME_ROW_CONTEXTMENU, EVENT_NAME_ROW_DBLCLICKED, EVENT_NAME_ROW_HOVERED, EVENT_NAME_ROW_MIDDLE_CLICKED, EVENT_NAME_ROW_SELECTED, EVENT_NAME_ROW_UNHOVERED, EVENT_NAME_SELECTED, EVENT_NAME_SLIDING_END, EVENT_NAME_SLIDING_START, EVENT_NAME_SORT_CHANGED, EVENT_NAME_TAG_STATE, EVENT_NAME_UNPAUSED, EVENT_NAME_UPDATE, MODEL_EVENT_NAME_PREFIX */
 var EVENT_NAME_ACTIVATE_TAB = 'activate-tab';
 var EVENT_NAME_BLUR = 'blur';
 var EVENT_NAME_CANCEL = 'cancel';
@@ -7076,7 +7105,6 @@ var EVENT_NAME_ENABLE = 'enable';
 var EVENT_NAME_ENABLED = 'enabled';
 var EVENT_NAME_FILTERED = 'filtered';
 var EVENT_NAME_FIRST = 'first';
-var EVENT_NAME_FOCUS = 'focus';
 var EVENT_NAME_FOCUSIN = 'focusin';
 var EVENT_NAME_FOCUSOUT = 'focusout';
 var EVENT_NAME_HEAD_CLICKED = 'head-clicked';
@@ -7113,8 +7141,8 @@ var EVENT_NAME_TAG_STATE = 'tag-state';
 var EVENT_NAME_TOGGLE = 'toggle';
 var EVENT_NAME_UNPAUSED = 'unpaused';
 var EVENT_NAME_UPDATE = 'update';
-var HOOK_EVENT_NAME_BEFORE_DESTROY = _vue__WEBPACK_IMPORTED_MODULE_0__/* .isVue3 */ .$B ? 'vnodeBeforeUnmount' : 'hook:beforeDestroy';
-var HOOK_EVENT_NAME_DESTROYED = _vue__WEBPACK_IMPORTED_MODULE_0__/* .isVue3 */ .$B ? 'vNodeUnmounted' : 'hook:destroyed';
+var HOOK_EVENT_NAME_BEFORE_DESTROY = 'hook:beforeDestroy';
+var HOOK_EVENT_NAME_DESTROYED = 'hook:destroyed';
 var MODEL_EVENT_NAME_PREFIX = 'update:';
 var ROOT_EVENT_NAME_PREFIX = 'bv';
 var ROOT_EVENT_NAME_SEPARATOR = '::';
@@ -7133,15 +7161,15 @@ var EVENT_OPTIONS_NO_CAPTURE = {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Mu: () => (/* binding */ PROP_TYPE_ARRAY_STRING),
-/* harmony export */   N0: () => (/* binding */ PROP_TYPE_STRING),
-/* harmony export */   U5: () => (/* binding */ PROP_TYPE_BOOLEAN),
-/* harmony export */   Vh: () => (/* binding */ PROP_TYPE_ARRAY_FUNCTION),
-/* harmony export */   ZW: () => (/* binding */ PROP_TYPE_OBJECT_STRING),
-/* harmony export */   aR: () => (/* binding */ PROP_TYPE_OBJECT),
-/* harmony export */   fE: () => (/* binding */ PROP_TYPE_NUMBER_STRING),
-/* harmony export */   r1: () => (/* binding */ PROP_TYPE_ANY),
-/* harmony export */   wA: () => (/* binding */ PROP_TYPE_ARRAY_OBJECT_STRING)
+/* harmony export */   "Mu": () => (/* binding */ PROP_TYPE_ARRAY_STRING),
+/* harmony export */   "N0": () => (/* binding */ PROP_TYPE_STRING),
+/* harmony export */   "U5": () => (/* binding */ PROP_TYPE_BOOLEAN),
+/* harmony export */   "Vh": () => (/* binding */ PROP_TYPE_ARRAY_FUNCTION),
+/* harmony export */   "ZW": () => (/* binding */ PROP_TYPE_OBJECT_STRING),
+/* harmony export */   "aR": () => (/* binding */ PROP_TYPE_OBJECT),
+/* harmony export */   "fE": () => (/* binding */ PROP_TYPE_NUMBER_STRING),
+/* harmony export */   "r1": () => (/* binding */ PROP_TYPE_ANY),
+/* harmony export */   "wA": () => (/* binding */ PROP_TYPE_ARRAY_OBJECT_STRING)
 /* harmony export */ });
 /* unused harmony exports PROP_TYPE_ARRAY, PROP_TYPE_DATE, PROP_TYPE_FUNCTION, PROP_TYPE_NUMBER, PROP_TYPE_REG_EXP, PROP_TYPE_ARRAY_OBJECT, PROP_TYPE_BOOLEAN_NUMBER, PROP_TYPE_BOOLEAN_NUMBER_STRING, PROP_TYPE_BOOLEAN_STRING, PROP_TYPE_DATE_STRING, PROP_TYPE_FUNCTION_STRING, PROP_TYPE_NUMBER_OBJECT_STRING, PROP_TYPE_OBJECT_FUNCTION */
 // General types
@@ -7152,7 +7180,7 @@ var PROP_TYPE_DATE = Date;
 var PROP_TYPE_FUNCTION = Function;
 var PROP_TYPE_NUMBER = Number;
 var PROP_TYPE_OBJECT = Object;
-var PROP_TYPE_REG_EXP = (/* unused pure expression or super */ null && (RegExp));
+var PROP_TYPE_REG_EXP = RegExp;
 var PROP_TYPE_STRING = String; // Multiple types
 
 var PROP_TYPE_ARRAY_FUNCTION = [PROP_TYPE_ARRAY, PROP_TYPE_FUNCTION];
@@ -7176,11 +7204,11 @@ var PROP_TYPE_OBJECT_STRING = [PROP_TYPE_OBJECT, PROP_TYPE_STRING];
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   $2: () => (/* binding */ RX_ENCODED_COMMA),
-/* harmony export */   Lj: () => (/* binding */ RX_HYPHENATE),
-/* harmony export */   OX: () => (/* binding */ RX_ARRAY_NOTATION),
-/* harmony export */   jo: () => (/* binding */ RX_BV_PREFIX),
-/* harmony export */   qn: () => (/* binding */ RX_ENCODE_REVERSE)
+/* harmony export */   "$2": () => (/* binding */ RX_ENCODED_COMMA),
+/* harmony export */   "Lj": () => (/* binding */ RX_HYPHENATE),
+/* harmony export */   "OX": () => (/* binding */ RX_ARRAY_NOTATION),
+/* harmony export */   "jo": () => (/* binding */ RX_BV_PREFIX),
+/* harmony export */   "qn": () => (/* binding */ RX_ENCODE_REVERSE)
 /* harmony export */ });
 /* unused harmony exports RX_DIGITS, RX_EXTENSION, RX_HASH, RX_HASH_ID, RX_HTML_TAGS, RX_LOWER_UPPER, RX_NUMBER, RX_PLUS, RX_REGEXP_REPLACE, RX_SPACES, RX_SPACE_SPLIT, RX_STAR, RX_START_SPACE_WORD, RX_TRIM_LEFT, RX_TRIM_RIGHT, RX_UNDERSCORE, RX_UN_KEBAB, RX_DATE, RX_DATE_SPLIT, RX_TIME, RX_HREF, RX_QUERY_START, RX_ASPECT, RX_ASPECT_SEPARATOR, RX_COL_CLASS, RX_ICON_PREFIX, RX_STRIP_LOCALE_MODS */
 // --- General ---
@@ -7235,20 +7263,20 @@ var RX_STRIP_LOCALE_MODS = /-u-.+/;
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   W_: () => (/* binding */ Element),
-/* harmony export */   mv: () => (/* binding */ HTMLElement)
+/* harmony export */   "W_": () => (/* binding */ Element),
+/* harmony export */   "mv": () => (/* binding */ HTMLElement)
 /* harmony export */ });
 /* unused harmony exports SVGElement, File */
 /* harmony import */ var _env__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6267);
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -7256,7 +7284,7 @@ function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new 
 
 function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
 
@@ -7267,7 +7295,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 /* istanbul ignore next */
 
-var Element = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW */ .m9.Element : /*#__PURE__*/function (_Object) {
+var Element = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW.Element */ .m9.Element : /*#__PURE__*/function (_Object) {
   _inherits(Element, _Object);
 
   var _super = _createSuper(Element);
@@ -7282,7 +7310,7 @@ var Element = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _
 }( /*#__PURE__*/_wrapNativeSuper(Object));
 /* istanbul ignore next */
 
-var HTMLElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW */ .m9.HTMLElement : /*#__PURE__*/function (_Element) {
+var HTMLElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW.HTMLElement */ .m9.HTMLElement : /*#__PURE__*/function (_Element) {
   _inherits(HTMLElement, _Element);
 
   var _super2 = _createSuper(HTMLElement);
@@ -7297,7 +7325,7 @@ var HTMLElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV
 }(Element);
 /* istanbul ignore next */
 
-var SVGElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW */ .m9.SVGElement : /*#__PURE__*/function (_Element2) {
+var SVGElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW.SVGElement */ .m9.SVGElement : /*#__PURE__*/function (_Element2) {
   _inherits(SVGElement, _Element2);
 
   var _super3 = _createSuper(SVGElement);
@@ -7312,7 +7340,7 @@ var SVGElement = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV 
 }(Element);
 /* istanbul ignore next */
 
-var File = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW */ .m9.File : /*#__PURE__*/function (_Object2) {
+var File = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env__WEBPACK_IMPORTED_MODULE_0__/* .WINDOW.File */ .m9.File : /*#__PURE__*/function (_Object2) {
   _inherits(File, _Object2);
 
   var _super4 = _createSuper(File);
@@ -7333,15 +7361,15 @@ var File = _env__WEBPACK_IMPORTED_MODULE_0__/* .HAS_WINDOW_SUPPORT */ .dV ? _env
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   K$: () => (/* binding */ SLOT_NAME_MODAL_OK),
-/* harmony export */   Pq: () => (/* binding */ SLOT_NAME_DEFAULT),
-/* harmony export */   Ro: () => (/* binding */ SLOT_NAME_MODAL_TITLE),
-/* harmony export */   Rv: () => (/* binding */ SLOT_NAME_MODAL_BACKDROP),
-/* harmony export */   XF: () => (/* binding */ SLOT_NAME_TOAST_TITLE),
-/* harmony export */   Xc: () => (/* binding */ SLOT_NAME_MODAL_CANCEL),
-/* harmony export */   _J: () => (/* binding */ SLOT_NAME_MODAL_FOOTER),
-/* harmony export */   ki: () => (/* binding */ SLOT_NAME_MODAL_HEADER),
-/* harmony export */   sW: () => (/* binding */ SLOT_NAME_MODAL_HEADER_CLOSE)
+/* harmony export */   "K$": () => (/* binding */ SLOT_NAME_MODAL_OK),
+/* harmony export */   "Pq": () => (/* binding */ SLOT_NAME_DEFAULT),
+/* harmony export */   "Ro": () => (/* binding */ SLOT_NAME_MODAL_TITLE),
+/* harmony export */   "Rv": () => (/* binding */ SLOT_NAME_MODAL_BACKDROP),
+/* harmony export */   "XF": () => (/* binding */ SLOT_NAME_TOAST_TITLE),
+/* harmony export */   "Xc": () => (/* binding */ SLOT_NAME_MODAL_CANCEL),
+/* harmony export */   "_J": () => (/* binding */ SLOT_NAME_MODAL_FOOTER),
+/* harmony export */   "ki": () => (/* binding */ SLOT_NAME_MODAL_HEADER),
+/* harmony export */   "sW": () => (/* binding */ SLOT_NAME_MODAL_HEADER_CLOSE)
 /* harmony export */ });
 /* unused harmony exports SLOT_NAME_ADD_BUTTON_TEXT, SLOT_NAME_APPEND, SLOT_NAME_ASIDE, SLOT_NAME_BADGE, SLOT_NAME_BOTTOM_ROW, SLOT_NAME_BUTTON_CONTENT, SLOT_NAME_CUSTOM_FOOT, SLOT_NAME_DECREMENT, SLOT_NAME_DESCRIPTION, SLOT_NAME_DISMISS, SLOT_NAME_DROP_PLACEHOLDER, SLOT_NAME_ELLIPSIS_TEXT, SLOT_NAME_EMPTY, SLOT_NAME_EMPTYFILTERED, SLOT_NAME_FILE_NAME, SLOT_NAME_FIRST, SLOT_NAME_FIRST_TEXT, SLOT_NAME_FOOTER, SLOT_NAME_HEADER, SLOT_NAME_HEADER_CLOSE, SLOT_NAME_ICON_CLEAR, SLOT_NAME_ICON_EMPTY, SLOT_NAME_ICON_FULL, SLOT_NAME_ICON_HALF, SLOT_NAME_IMG, SLOT_NAME_INCREMENT, SLOT_NAME_INVALID_FEEDBACK, SLOT_NAME_LABEL, SLOT_NAME_LAST_TEXT, SLOT_NAME_LEAD, SLOT_NAME_LOADING, SLOT_NAME_NAV_NEXT_DECADE, SLOT_NAME_NAV_NEXT_MONTH, SLOT_NAME_NAV_NEXT_YEAR, SLOT_NAME_NAV_PEV_DECADE, SLOT_NAME_NAV_PEV_MONTH, SLOT_NAME_NAV_PEV_YEAR, SLOT_NAME_NAV_THIS_MONTH, SLOT_NAME_NEXT_TEXT, SLOT_NAME_OVERLAY, SLOT_NAME_PAGE, SLOT_NAME_PLACEHOLDER, SLOT_NAME_PREPEND, SLOT_NAME_PREV_TEXT, SLOT_NAME_ROW_DETAILS, SLOT_NAME_TABLE_BUSY, SLOT_NAME_TABLE_CAPTION, SLOT_NAME_TABLE_COLGROUP, SLOT_NAME_TABS_END, SLOT_NAME_TABS_START, SLOT_NAME_TEXT, SLOT_NAME_THEAD_TOP, SLOT_NAME_TITLE, SLOT_NAME_TOP_ROW, SLOT_NAME_VALID_FEEDBACK */
 var SLOT_NAME_ADD_BUTTON_TEXT = 'add-button-text';
@@ -7416,34 +7444,11 @@ var SLOT_NAME_VALID_FEEDBACK = 'valid-feedback';
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   D: () => (/* binding */ attrsMixin)
+/* harmony export */   "D": () => (/* binding */ attrsMixin)
 /* harmony export */ });
 /* harmony import */ var _utils_cache__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5535);
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7137);
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-
-var attrsMixinVue2 = (0,_utils_cache__WEBPACK_IMPORTED_MODULE_0__/* .makePropCacheMixin */ .L)('$attrs', 'bvAttrs');
-var attrsMixinVue3 = (0,_vue__WEBPACK_IMPORTED_MODULE_1__/* .extend */ .l7)({
-  computed: {
-    bvAttrs: function bvAttrs() {
-      var bvAttrs = _objectSpread({}, this.$attrs);
-
-      Object.keys(bvAttrs).forEach(function (key) {
-        if (bvAttrs[key] === undefined) {
-          delete bvAttrs[key];
-        }
-      });
-      return bvAttrs;
-    }
-  }
-});
-var attrsMixin = _vue__WEBPACK_IMPORTED_MODULE_1__/* .isVue3 */ .$B ? attrsMixinVue3 : attrsMixinVue2;
+var attrsMixin = (0,_utils_cache__WEBPACK_IMPORTED_MODULE_0__/* .makePropCacheMixin */ .L)('$attrs', 'bvAttrs');
 
 /***/ }),
 
@@ -7452,10 +7457,12 @@ var attrsMixin = _vue__WEBPACK_IMPORTED_MODULE_1__/* .isVue3 */ .$B ? attrsMixin
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   N: () => (/* binding */ props),
-/* harmony export */   t: () => (/* binding */ idMixin)
+/* harmony export */   "N": () => (/* binding */ props),
+/* harmony export */   "t": () => (/* binding */ idMixin)
 /* harmony export */ });
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7137);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7137);
 /* harmony import */ var _constants_props__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3022);
 /* harmony import */ var _utils_props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3194);
 // SSR safe client-side ID attribute generation
@@ -7470,7 +7477,7 @@ var props = {
 }; // --- Mixin ---
 // @vue/component
 
-var idMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend */ .l7)({
+var idMixin = _vue__WEBPACK_IMPORTED_MODULE_2___default().extend({
   props: props,
   data: function data() {
     return {
@@ -7504,7 +7511,7 @@ var idMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend */ .l7)({
     this.$nextTick(function () {
       // Update DOM with auto-generated ID after mount
       // to prevent SSR hydration errors
-      _this.localId_ = "__BVID__".concat(_this[_vue__WEBPACK_IMPORTED_MODULE_2__/* .COMPONENT_UID_KEY */ .X$]);
+      _this.localId_ = "__BVID__".concat(_this[_vue__WEBPACK_IMPORTED_MODULE_3__/* .COMPONENT_UID_KEY */ .X$]);
     });
   }
 });
@@ -7516,90 +7523,49 @@ var idMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_2__/* .extend */ .l7)({
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   E: () => (/* binding */ listenOnRootMixin)
+/* harmony export */   "E": () => (/* binding */ listenOnRootMixin)
 /* harmony export */ });
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7137);
-/* harmony import */ var _utils_array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1721);
-/* harmony import */ var _utils_object__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6819);
-/* harmony import */ var _utils_get_event_root__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8887);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _constants_events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4196);
 
+ // @vue/component
 
-
- // --- Constants ---
-
-var PROP = '$_rootListeners'; // --- Mixin ---
-// @vue/component
-
-var listenOnRootMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
-  computed: {
-    bvEventRoot: function bvEventRoot() {
-      return (0,_utils_get_event_root__WEBPACK_IMPORTED_MODULE_1__/* .getEventRoot */ .C)(this);
-    }
-  },
-  created: function created() {
-    // Define non-reactive property
-    // Object of arrays, keyed by event name,
-    // where value is an array of callbacks
-    this[PROP] = {};
-  },
-  beforeDestroy: function beforeDestroy() {
-    var _this = this;
-
-    // Unregister all registered listeners
-    (0,_utils_object__WEBPACK_IMPORTED_MODULE_2__/* .keys */ .XP)(this[PROP] || {}).forEach(function (event) {
-      _this[PROP][event].forEach(function (callback) {
-        _this.listenOffRoot(event, callback);
-      });
-    });
-    this[PROP] = null;
-  },
+var listenOnRootMixin = _vue__WEBPACK_IMPORTED_MODULE_0___default().extend({
   methods: {
-    registerRootListener: function registerRootListener(event, callback) {
-      if (this[PROP]) {
-        this[PROP][event] = this[PROP][event] || [];
-
-        if (!(0,_utils_array__WEBPACK_IMPORTED_MODULE_3__/* .arrayIncludes */ .kI)(this[PROP][event], callback)) {
-          this[PROP][event].push(callback);
-        }
-      }
-    },
-    unregisterRootListener: function unregisterRootListener(event, callback) {
-      if (this[PROP] && this[PROP][event]) {
-        this[PROP][event] = this[PROP][event].filter(function (cb) {
-          return cb !== callback;
-        });
-      }
-    },
-
     /**
      * Safely register event listeners on the root Vue node
      * While Vue automatically removes listeners for individual components,
-     * when a component registers a listener on `$root` and is destroyed,
-     * this orphans a callback because the node is gone, but the `$root`
-     * does not clear the callback
+     * when a component registers a listener on root and is destroyed,
+     * this orphans a callback because the node is gone,
+     * but the root does not clear the callback
      *
-     * When registering a `$root` listener, it also registers the listener
-     * to be removed in the component's `beforeDestroy()` hook
+     * When registering a `$root` listener, it also registers a listener on
+     * the component's `beforeDestroy()` hook to automatically remove the
+     * event listener from the `$root` instance
      *
      * @param {string} event
      * @param {function} callback
      */
     listenOnRoot: function listenOnRoot(event, callback) {
-      if (this.bvEventRoot) {
-        this.bvEventRoot.$on(event, callback);
-        this.registerRootListener(event, callback);
-      }
+      var _this = this;
+
+      this.$root.$on(event, callback);
+      this.$on(_constants_events__WEBPACK_IMPORTED_MODULE_1__/* .HOOK_EVENT_NAME_BEFORE_DESTROY */ .vl, function () {
+        _this.$root.$off(event, callback);
+      });
     },
 
     /**
      * Safely register a `$once()` event listener on the root Vue node
      * While Vue automatically removes listeners for individual components,
-     * when a component registers a listener on `$root` and is destroyed,
-     * this orphans a callback because the node is gone, but the `$root`
-     * does not clear the callback
+     * when a component registers a listener on root and is destroyed,
+     * this orphans a callback because the node is gone,
+     * but the root does not clear the callback
      *
-     * When registering a `$root` listener, it also registers the listener
-     * to be removed in the component's `beforeDestroy()` hook
+     * When registering a $root listener, it also registers a listener on
+     * the component's `beforeDestroy` hook to automatically remove the
+     * event listener from the $root instance.
      *
      * @param {string} event
      * @param {function} callback
@@ -7607,49 +7573,26 @@ var listenOnRootMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
     listenOnRootOnce: function listenOnRootOnce(event, callback) {
       var _this2 = this;
 
-      if (this.bvEventRoot) {
-        var _callback = function _callback() {
-          _this2.unregisterRootListener(_callback); // eslint-disable-next-line node/no-callback-literal
-
-
-          callback.apply(void 0, arguments);
-        };
-
-        this.bvEventRoot.$once(event, _callback);
-        this.registerRootListener(event, _callback);
-      }
+      this.$root.$once(event, callback);
+      this.$on(_constants_events__WEBPACK_IMPORTED_MODULE_1__/* .HOOK_EVENT_NAME_BEFORE_DESTROY */ .vl, function () {
+        _this2.$root.$off(event, callback);
+      });
     },
 
     /**
-     * Safely unregister event listeners from the root Vue node
-     *
-     * @param {string} event
-     * @param {function} callback
-     */
-    listenOffRoot: function listenOffRoot(event, callback) {
-      this.unregisterRootListener(event, callback);
-
-      if (this.bvEventRoot) {
-        this.bvEventRoot.$off(event, callback);
-      }
-    },
-
-    /**
-     * Convenience method for calling `vm.$emit()` on `$root`
+     * Convenience method for calling `vm.$emit()` on `vm.$root`
      *
      * @param {string} event
      * @param {*} args
      */
     emitOnRoot: function emitOnRoot(event) {
-      if (this.bvEventRoot) {
-        var _this$bvEventRoot;
+      var _this$$root;
 
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        (_this$bvEventRoot = this.bvEventRoot).$emit.apply(_this$bvEventRoot, [event].concat(args));
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
       }
+
+      (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args));
     }
   }
 });
@@ -7661,9 +7604,10 @@ var listenOnRootMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ normalizeSlotMixin)
+/* harmony export */   "Z": () => (/* binding */ normalizeSlotMixin)
 /* harmony export */ });
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7137);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _constants_slots__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4830);
 /* harmony import */ var _utils_normalize_slot__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4442);
 /* harmony import */ var _utils_array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1721);
@@ -7672,7 +7616,7 @@ var listenOnRootMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
 
  // @vue/component
 
-var normalizeSlotMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
+var normalizeSlotMixin = _vue__WEBPACK_IMPORTED_MODULE_0___default().extend({
   methods: {
     // Returns `true` if the either a `$scopedSlot` or `$slot` exists with the specified name
     // `name` can be a string name or an array of names
@@ -7706,13 +7650,12 @@ var normalizeSlotMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)(
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  o: () => (/* binding */ scopedStyleMixin)
+  "o": () => (/* binding */ scopedStyleMixin)
 });
 
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
-var vue = __webpack_require__(7137);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/mixins/use-parent.js
-var use_parent = __webpack_require__(1403);
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/get-scope-id.js
 // This method returns a component's scoped style attribute name: `data-v-xxxxxxx`
 // The `_scopeId` options property is added by vue-loader when using scoped styles
@@ -7725,36 +7668,13 @@ var getScopeId = function getScopeId(vm) {
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-
  // @vue/component
 
-var scopedStyleMixin = (0,vue/* extend */.l7)({
-  mixins: [use_parent/* useParentMixin */.S],
+var scopedStyleMixin = external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
   computed: {
     scopedStyleAttrs: function scopedStyleAttrs() {
-      var scopeId = getScopeId(this.bvParent);
+      var scopeId = getScopeId(this.$parent);
       return scopeId ? _defineProperty({}, scopeId, '') : {};
-    }
-  }
-});
-
-/***/ }),
-
-/***/ 1403:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   S: () => (/* binding */ useParentMixin)
-/* harmony export */ });
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7137);
- // --- Mixin ---
-// @vue/component
-
-var useParentMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
-  computed: {
-    bvParent: function bvParent() {
-      return this.$parent || this.$root === this && this.$options.bvParent;
     }
   }
 });
@@ -7766,9 +7686,9 @@ var useParentMixin = (0,_vue__WEBPACK_IMPORTED_MODULE_0__/* .extend */ .l7)({
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Dp: () => (/* binding */ from),
-/* harmony export */   kI: () => (/* binding */ arrayIncludes),
-/* harmony export */   zo: () => (/* binding */ concat)
+/* harmony export */   "Dp": () => (/* binding */ from),
+/* harmony export */   "kI": () => (/* binding */ arrayIncludes),
+/* harmony export */   "zo": () => (/* binding */ concat)
 /* harmony export */ });
 /* unused harmony exports createArray, flatten, flattenDeep */
  // --- Static ---
@@ -7814,14 +7734,14 @@ var flattenDeep = function flattenDeep(array) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   n: () => (/* binding */ BvEvent)
+/* harmony export */   "n": () => (/* binding */ BvEvent)
 /* harmony export */ });
 /* harmony import */ var _object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6819);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
 var BvEvent = /*#__PURE__*/function () {
@@ -7897,13 +7817,14 @@ var BvEvent = /*#__PURE__*/function () {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  L: () => (/* binding */ makePropCacheMixin)
+  "L": () => (/* binding */ makePropCacheMixin)
 });
 
 // UNUSED EXPORTS: makePropWatcher
 
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
-var vue = __webpack_require__(7137);
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/clone-deep.js
 var clone_deep = __webpack_require__(3595);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/object.js
@@ -8019,7 +7940,7 @@ var makePropWatcher = function makePropWatcher(propName) {
   };
 };
 var makePropCacheMixin = function makePropCacheMixin(propName, proxyPropName) {
-  return (0,vue/* extend */.l7)({
+  return external_commonjs_vue_commonjs2_vue_root_Vue_default().extend({
     data: function data() {
       return _defineProperty({}, proxyPropName, (0,clone_deep/* cloneDeep */.X)(this[propName]));
     },
@@ -8034,13 +7955,13 @@ var makePropCacheMixin = function makePropCacheMixin(propName, proxyPropName) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   X: () => (/* binding */ cloneDeep)
+/* harmony export */   "X": () => (/* binding */ cloneDeep)
 /* harmony export */ });
 /* harmony import */ var _inspect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6498);
 /* harmony import */ var _object__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6819);
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -8050,7 +7971,7 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
@@ -8085,13 +8006,13 @@ var cloneDeep = function cloneDeep(obj) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  wJ: () => (/* binding */ getComponentConfig)
+  "wJ": () => (/* binding */ getComponentConfig)
 });
 
 // UNUSED EXPORTS: getBreakpoints, getBreakpointsCached, getBreakpointsDown, getBreakpointsDownCached, getBreakpointsUp, getBreakpointsUpCached, getConfig, getConfigValue
 
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
-var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(3797);
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/config.js
 var config = __webpack_require__(887);
@@ -8186,61 +8107,36 @@ var getBreakpointsDownCached = function getBreakpointsDownCached() {
 
 /***/ }),
 
-/***/ 2705:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   H: () => (/* binding */ createNewChildComponent)
-/* harmony export */ });
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var createNewChildComponent = function createNewChildComponent(parent, Component) {
-  var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var bvEventRoot = parent.$root ? parent.$root.$options.bvEventRoot || parent.$root : null;
-  return new Component(_objectSpread(_objectSpread({}, config), {}, {
-    parent: parent,
-    bvParent: parent,
-    bvEventRoot: bvEventRoot
-  }));
-};
-
-/***/ }),
-
 /***/ 3470:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A_: () => (/* binding */ setStyle),
-/* harmony export */   B$: () => (/* binding */ hasAttr),
-/* harmony export */   C2: () => (/* binding */ getStyle),
-/* harmony export */   Cx: () => (/* binding */ attemptBlur),
-/* harmony export */   IV: () => (/* binding */ removeClass),
-/* harmony export */   KS: () => (/* binding */ attemptFocus),
-/* harmony export */   UK: () => (/* binding */ getAttr),
-/* harmony export */   YR: () => (/* binding */ isTag),
-/* harmony export */   Ys: () => (/* binding */ select),
-/* harmony export */   ZF: () => (/* binding */ removeNode),
-/* harmony export */   Zt: () => (/* binding */ getBCR),
-/* harmony export */   a8: () => (/* binding */ selectAll),
-/* harmony export */   bz: () => (/* binding */ requestAF),
-/* harmony export */   cn: () => (/* binding */ addClass),
-/* harmony export */   fi: () => (/* binding */ setAttr),
-/* harmony export */   iI: () => (/* binding */ MutationObs),
-/* harmony export */   kK: () => (/* binding */ isElement),
-/* harmony export */   oq: () => (/* binding */ closest),
-/* harmony export */   pK: () => (/* binding */ isDisabled),
-/* harmony export */   r3: () => (/* binding */ contains),
-/* harmony export */   td: () => (/* binding */ getTabables),
-/* harmony export */   uV: () => (/* binding */ removeAttr),
-/* harmony export */   vY: () => (/* binding */ getActiveElement),
-/* harmony export */   wB: () => (/* binding */ matches),
-/* harmony export */   yD: () => (/* binding */ getCS)
+/* harmony export */   "A_": () => (/* binding */ setStyle),
+/* harmony export */   "B$": () => (/* binding */ hasAttr),
+/* harmony export */   "C2": () => (/* binding */ getStyle),
+/* harmony export */   "Cx": () => (/* binding */ attemptBlur),
+/* harmony export */   "IV": () => (/* binding */ removeClass),
+/* harmony export */   "KS": () => (/* binding */ attemptFocus),
+/* harmony export */   "UK": () => (/* binding */ getAttr),
+/* harmony export */   "YR": () => (/* binding */ isTag),
+/* harmony export */   "Ys": () => (/* binding */ select),
+/* harmony export */   "ZF": () => (/* binding */ removeNode),
+/* harmony export */   "Zt": () => (/* binding */ getBCR),
+/* harmony export */   "a8": () => (/* binding */ selectAll),
+/* harmony export */   "bz": () => (/* binding */ requestAF),
+/* harmony export */   "cn": () => (/* binding */ addClass),
+/* harmony export */   "fi": () => (/* binding */ setAttr),
+/* harmony export */   "iI": () => (/* binding */ MutationObs),
+/* harmony export */   "kK": () => (/* binding */ isElement),
+/* harmony export */   "oq": () => (/* binding */ closest),
+/* harmony export */   "pK": () => (/* binding */ isDisabled),
+/* harmony export */   "r3": () => (/* binding */ contains),
+/* harmony export */   "td": () => (/* binding */ getTabables),
+/* harmony export */   "uV": () => (/* binding */ removeAttr),
+/* harmony export */   "vY": () => (/* binding */ getActiveElement),
+/* harmony export */   "wB": () => (/* binding */ matches),
+/* harmony export */   "yD": () => (/* binding */ getCS)
 /* harmony export */ });
 /* unused harmony exports matchesEl, closestEl, isActiveElement, isVisible, reflow, getById, hasClass, removeStyle, getSel, offset, position */
 /* harmony import */ var _constants_env__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6267);
@@ -8255,7 +8151,7 @@ var createNewChildComponent = function createNewChildComponent(parent, Component
 
  // --- Constants ---
 
-var ELEMENT_PROTO = _constants_safe_types__WEBPACK_IMPORTED_MODULE_0__/* .Element */ .W_.prototype;
+var ELEMENT_PROTO = _constants_safe_types__WEBPACK_IMPORTED_MODULE_0__/* .Element.prototype */ .W_.prototype;
 var TABABLE_SELECTOR = ['button', '[href]:not(.disabled)', 'input', 'select', 'textarea', '[tabindex]', '[contenteditable]'].map(function (s) {
   return "".concat(s, ":not(:disabled):not([disabled])");
 }).join(', '); // --- Normalization utils ---
@@ -8284,14 +8180,14 @@ var closestEl = ELEMENT_PROTO.closest || function (sel) {
 
 /* istanbul ignore next: JSDOM always returns the first option */
 
-var requestAF = (_constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.requestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.webkitRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.mozRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.msRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.oRequestAnimationFrame || // Fallback, but not a true polyfill
+var requestAF = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.requestAnimationFrame */ .m9.requestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.webkitRequestAnimationFrame */ .m9.webkitRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.mozRequestAnimationFrame */ .m9.mozRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.msRequestAnimationFrame */ .m9.msRequestAnimationFrame || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.oRequestAnimationFrame */ .m9.oRequestAnimationFrame || // Fallback, but not a true polyfill
 // Only needed for Opera Mini
 
 /* istanbul ignore next */
 function (cb) {
   return setTimeout(cb, 16);
-}).bind(_constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9);
-var MutationObs = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.MutationObserver || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.WebKitMutationObserver || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.MozMutationObserver || null; // --- Utils ---
+};
+var MutationObs = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.MutationObserver */ .m9.MutationObserver || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.WebKitMutationObserver */ .m9.WebKitMutationObserver || _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.MozMutationObserver */ .m9.MozMutationObserver || null; // --- Utils ---
 // Remove a node from DOM
 
 var removeNode = function removeNode(el) {
@@ -8304,7 +8200,7 @@ var isElement = function isElement(el) {
 
 var getActiveElement = function getActiveElement() {
   var excludes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-  var activeElement = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .DOCUMENT */ .K0.activeElement;
+  var activeElement = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .DOCUMENT.activeElement */ .K0.activeElement;
   return activeElement && !excludes.some(function (el) {
     return el === activeElement;
   }) ? activeElement : null;
@@ -8319,7 +8215,7 @@ var isActiveElement = function isActiveElement(el) {
 }; // Determine if an HTML element is visible - Faster than CSS check
 
 var isVisible = function isVisible(el) {
-  if (!isElement(el) || !el.parentNode || !contains(_constants_env__WEBPACK_IMPORTED_MODULE_2__/* .DOCUMENT */ .K0.body, el)) {
+  if (!isElement(el) || !el.parentNode || !contains(_constants_env__WEBPACK_IMPORTED_MODULE_2__/* .DOCUMENT.body */ .K0.body, el)) {
     // Note this can fail for shadow dom elements since they
     // are not a direct descendant of document.body
     return false;
@@ -8462,7 +8358,7 @@ var getBCR = function getBCR(el) {
 /* istanbul ignore next: getComputedStyle() doesn't work in JSDOM */
 
 var getCS = function getCS(el) {
-  var getComputedStyle = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW */ .m9.getComputedStyle;
+  var getComputedStyle = _constants_env__WEBPACK_IMPORTED_MODULE_2__/* .WINDOW.getComputedStyle */ .m9.getComputedStyle;
   return getComputedStyle && isElement(el) ? getComputedStyle(el) : {};
 }; // Returns a `Selection` object representing the range of text selected
 // Returns `null` if no window support is given
@@ -8575,12 +8471,12 @@ var attemptBlur = function attemptBlur(el) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   J3: () => (/* binding */ getRootEventName),
-/* harmony export */   QY: () => (/* binding */ eventOff),
-/* harmony export */   XO: () => (/* binding */ eventOn),
-/* harmony export */   gA: () => (/* binding */ getRootActionEventName),
-/* harmony export */   p7: () => (/* binding */ stopEvent),
-/* harmony export */   tU: () => (/* binding */ eventOnOff)
+/* harmony export */   "J3": () => (/* binding */ getRootEventName),
+/* harmony export */   "QY": () => (/* binding */ eventOff),
+/* harmony export */   "XO": () => (/* binding */ eventOn),
+/* harmony export */   "gA": () => (/* binding */ getRootActionEventName),
+/* harmony export */   "p7": () => (/* binding */ stopEvent),
+/* harmony export */   "tU": () => (/* binding */ eventOnOff)
 /* harmony export */ });
 /* unused harmony export parseEventOptions */
 /* harmony import */ var _constants_env__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6267);
@@ -8672,25 +8568,12 @@ var getRootActionEventName = function getRootActionEventName(name, actionName) {
 
 /***/ }),
 
-/***/ 8887:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   C: () => (/* binding */ getEventRoot)
-/* harmony export */ });
-var getEventRoot = function getEventRoot(vm) {
-  return vm.$root.$options.bvEventRoot || vm.$root;
-};
-
-/***/ }),
-
 /***/ 5443:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   y: () => (/* binding */ identity)
+/* harmony export */   "y": () => (/* binding */ identity)
 /* harmony export */ });
 var identity = function identity(x) {
   return x;
@@ -8703,20 +8586,20 @@ var identity = function identity(x) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Ft: () => (/* binding */ isNull),
-/* harmony export */   HD: () => (/* binding */ isString),
-/* harmony export */   J_: () => (/* binding */ isDate),
-/* harmony export */   Jp: () => (/* binding */ isUndefinedOrNull),
-/* harmony export */   Kn: () => (/* binding */ isObject),
-/* harmony export */   PO: () => (/* binding */ isPlainObject),
-/* harmony export */   cO: () => (/* binding */ isEvent),
-/* harmony export */   jn: () => (/* binding */ isBoolean),
-/* harmony export */   kJ: () => (/* binding */ isArray),
-/* harmony export */   mf: () => (/* binding */ isFunction),
-/* harmony export */   o8: () => (/* binding */ isUndefined)
+/* harmony export */   "Ft": () => (/* binding */ isNull),
+/* harmony export */   "HD": () => (/* binding */ isString),
+/* harmony export */   "J_": () => (/* binding */ isDate),
+/* harmony export */   "Jp": () => (/* binding */ isUndefinedOrNull),
+/* harmony export */   "Kn": () => (/* binding */ isObject),
+/* harmony export */   "PO": () => (/* binding */ isPlainObject),
+/* harmony export */   "cO": () => (/* binding */ isEvent),
+/* harmony export */   "jn": () => (/* binding */ isBoolean),
+/* harmony export */   "kJ": () => (/* binding */ isArray),
+/* harmony export */   "mf": () => (/* binding */ isFunction),
+/* harmony export */   "o8": () => (/* binding */ isUndefined)
 /* harmony export */ });
 /* unused harmony exports toType, toRawType, toRawTypeLC, isEmptyString, isUndefinedOrNullOrEmpty, isNumber, isNumeric, isPrimitive, isFile, isRegExp, isPromise */
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 
  // --- Convenience inspection utilities ---
@@ -8801,9 +8684,10 @@ var isPromise = function isPromise(value) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   l: () => (/* binding */ makeModelMixin)
+/* harmony export */   "l": () => (/* binding */ makeModelMixin)
 /* harmony export */ });
-/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7137);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7203);
+/* harmony import */ var _vue__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vue__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _constants_events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4196);
 /* harmony import */ var _constants_props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3022);
 /* harmony import */ var _props__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3194);
@@ -8827,7 +8711,7 @@ var makeModelMixin = function makeModelMixin(prop) {
   var props = _defineProperty({}, prop, (0,_props__WEBPACK_IMPORTED_MODULE_2__/* .makeProp */ .pi)(type, defaultValue, validator)); // @vue/component
 
 
-  var mixin = (0,_vue__WEBPACK_IMPORTED_MODULE_3__/* .extend */ .l7)({
+  var mixin = _vue__WEBPACK_IMPORTED_MODULE_3___default().extend({
     model: {
       prop: prop,
       event: event
@@ -8849,8 +8733,8 @@ var makeModelMixin = function makeModelMixin(prop) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   O: () => (/* binding */ normalizeSlot),
-/* harmony export */   Q: () => (/* binding */ hasNormalizedSlot)
+/* harmony export */   "O": () => (/* binding */ normalizeSlot),
+/* harmony export */   "Q": () => (/* binding */ hasNormalizedSlot)
 /* harmony export */ });
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1721);
 /* harmony import */ var _identity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5443);
@@ -8915,8 +8799,8 @@ var normalizeSlot = function normalizeSlot(names) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z3: () => (/* binding */ toInteger),
-/* harmony export */   f_: () => (/* binding */ toFloat)
+/* harmony export */   "Z3": () => (/* binding */ toInteger),
+/* harmony export */   "f_": () => (/* binding */ toFloat)
 /* harmony export */ });
 /* unused harmony export toFixed */
 // Number utilities
@@ -8947,22 +8831,22 @@ var toFixed = function toFixed(val, precision) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   CE: () => (/* binding */ omit),
-/* harmony export */   GE: () => (/* binding */ sortKeys),
-/* harmony export */   MB: () => (/* binding */ readonlyDescriptor),
-/* harmony export */   Sv: () => (/* binding */ getOwnPropertyNames),
-/* harmony export */   Ue: () => (/* binding */ create),
-/* harmony export */   XP: () => (/* binding */ keys),
-/* harmony export */   _x: () => (/* binding */ defineProperty),
-/* harmony export */   ei: () => (/* binding */ pick),
-/* harmony export */   f0: () => (/* binding */ assign),
-/* harmony export */   hc: () => (/* binding */ defineProperties),
-/* harmony export */   nr: () => (/* binding */ hasOwnProperty)
+/* harmony export */   "CE": () => (/* binding */ omit),
+/* harmony export */   "GE": () => (/* binding */ sortKeys),
+/* harmony export */   "MB": () => (/* binding */ readonlyDescriptor),
+/* harmony export */   "Sv": () => (/* binding */ getOwnPropertyNames),
+/* harmony export */   "Ue": () => (/* binding */ create),
+/* harmony export */   "XP": () => (/* binding */ keys),
+/* harmony export */   "_x": () => (/* binding */ defineProperty),
+/* harmony export */   "ei": () => (/* binding */ pick),
+/* harmony export */   "f0": () => (/* binding */ assign),
+/* harmony export */   "hc": () => (/* binding */ defineProperties),
+/* harmony export */   "nr": () => (/* binding */ hasOwnProperty)
 /* harmony export */ });
 /* unused harmony exports freeze, getOwnPropertyDescriptor, getOwnPropertySymbols, getPrototypeOf, is, isFrozen, toString, clone, mergeDeep */
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -9077,13 +8961,13 @@ var readonlyDescriptor = function readonlyDescriptor() {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Hr: () => (/* binding */ pluginFactory)
+  "Hr": () => (/* binding */ pluginFactory)
 });
 
 // UNUSED EXPORTS: checkMultipleVue, installFactory, installFactoryNoConfig, pluginFactoryNoConfig, registerComponent, registerComponents, registerDirective, registerDirectives, registerPlugins, vueUse
 
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
-var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(3797);
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(7203);
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/env.js
 var env = __webpack_require__(6267);
@@ -9168,7 +9052,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
 
@@ -9266,9 +9150,9 @@ var resetConfig = function resetConfig() {
   }
 };
 ;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/plugins.js
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -9470,9 +9354,9 @@ var vueUse = function vueUse(VuePlugin) {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   pi: () => (/* binding */ makeProp),
-/* harmony export */   uj: () => (/* binding */ pluckProps),
-/* harmony export */   y2: () => (/* binding */ makePropsConfigurable)
+/* harmony export */   "pi": () => (/* binding */ makeProp),
+/* harmony export */   "uj": () => (/* binding */ pluckProps),
+/* harmony export */   "y2": () => (/* binding */ makePropsConfigurable)
 /* harmony export */ });
 /* unused harmony exports prefixPropName, unprefixPropName, suffixPropName, copyProps, makePropConfigurable, hasPropFunction */
 /* harmony import */ var _constants_props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3022);
@@ -9481,9 +9365,9 @@ var vueUse = function vueUse(VuePlugin) {
 /* harmony import */ var _identity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5443);
 /* harmony import */ var _inspect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6498);
 /* harmony import */ var _object__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6819);
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -9588,54 +9472,28 @@ var configurablePropDefaultFnName = makePropConfigurable({}, '', '').default.nam
 // and isn't the props default function
 
 var hasPropFunction = function hasPropFunction(fn) {
-  return isFunction(fn) && fn.name && fn.name !== configurablePropDefaultFnName;
+  return isFunction(fn) && fn.name !== configurablePropDefaultFnName;
 };
 
 /***/ }),
 
-/***/ 1955:
+/***/ 9022:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  tN: () => (/* binding */ computeHref),
-  Bb: () => (/* binding */ computeRel),
-  nX: () => (/* binding */ computeTag),
-  u$: () => (/* binding */ isLink),
-  xo: () => (/* binding */ isRouterLink)
-});
-
-// UNUSED EXPORTS: parseQuery, stringifyQueryObj
-
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/regex.js
-var regex = __webpack_require__(3177);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/dom.js
-var dom = __webpack_require__(3470);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/inspect.js
-var inspect = __webpack_require__(6498);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/object.js
-var object = __webpack_require__(6819);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/vue.js
-var vue = __webpack_require__(7137);
-;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/safe-vue-instance.js
-
-function safeVueInstance(target) {
-  if (!vue/* isVue3 */.$B) {
-    return target;
-  }
-
-  return new Proxy(target, {
-    get: function get(target, prop) {
-      return prop in target ? target[prop] : undefined;
-    }
-  });
-}
-// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/string.js
-var string = __webpack_require__(6824);
-;// CONCATENATED MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/utils/router.js
-
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Bb": () => (/* binding */ computeRel),
+/* harmony export */   "nX": () => (/* binding */ computeTag),
+/* harmony export */   "tN": () => (/* binding */ computeHref),
+/* harmony export */   "u$": () => (/* binding */ isLink),
+/* harmony export */   "xo": () => (/* binding */ isRouterLink)
+/* harmony export */ });
+/* unused harmony exports stringifyQueryObj, parseQuery */
+/* harmony import */ var _constants_regex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3177);
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3470);
+/* harmony import */ var _inspect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6498);
+/* harmony import */ var _object__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6819);
+/* harmony import */ var _string__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6824);
 
 
 
@@ -9651,29 +9509,29 @@ var encodeReserveReplacer = function encodeReserveReplacer(c) {
 
 
 var encode = function encode(str) {
-  return encodeURIComponent((0,string/* toString */.BB)(str)).replace(regex/* RX_ENCODE_REVERSE */.qn, encodeReserveReplacer).replace(regex/* RX_ENCODED_COMMA */.$2, ',');
+  return encodeURIComponent((0,_string__WEBPACK_IMPORTED_MODULE_0__/* .toString */ .BB)(str)).replace(_constants_regex__WEBPACK_IMPORTED_MODULE_1__/* .RX_ENCODE_REVERSE */ .qn, encodeReserveReplacer).replace(_constants_regex__WEBPACK_IMPORTED_MODULE_1__/* .RX_ENCODED_COMMA */ .$2, ',');
 };
 
-var decode = (/* unused pure expression or super */ null && (decodeURIComponent)); // Stringifies an object of query parameters
+var decode = decodeURIComponent; // Stringifies an object of query parameters
 // See: https://github.com/vuejs/vue-router/blob/dev/src/util/query.js
 
 var stringifyQueryObj = function stringifyQueryObj(obj) {
-  if (!(0,inspect/* isPlainObject */.PO)(obj)) {
+  if (!(0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isPlainObject */ .PO)(obj)) {
     return '';
   }
 
-  var query = (0,object/* keys */.XP)(obj).map(function (key) {
+  var query = (0,_object__WEBPACK_IMPORTED_MODULE_3__/* .keys */ .XP)(obj).map(function (key) {
     var value = obj[key];
 
-    if ((0,inspect/* isUndefined */.o8)(value)) {
+    if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isUndefined */ .o8)(value)) {
       return '';
-    } else if ((0,inspect/* isNull */.Ft)(value)) {
+    } else if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isNull */ .Ft)(value)) {
       return encode(key);
-    } else if ((0,inspect/* isArray */.kJ)(value)) {
+    } else if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isArray */ .kJ)(value)) {
       return value.reduce(function (results, value2) {
-        if ((0,inspect/* isNull */.Ft)(value2)) {
+        if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isNull */ .Ft)(value2)) {
           results.push(encode(key));
-        } else if (!(0,inspect/* isUndefined */.o8)(value2)) {
+        } else if (!(0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isUndefined */ .o8)(value2)) {
           // Faster than string interpolation
           results.push(encode(key) + '=' + encode(value2));
         }
@@ -9718,14 +9576,13 @@ var isLink = function isLink(props) {
   return !!(props.href || props.to);
 };
 var isRouterLink = function isRouterLink(tag) {
-  return !!(tag && !(0,dom/* isTag */.YR)(tag, 'a'));
+  return !!(tag && !(0,_dom__WEBPACK_IMPORTED_MODULE_4__/* .isTag */ .YR)(tag, 'a'));
 };
 var computeTag = function computeTag(_ref, thisOrParent) {
   var to = _ref.to,
       disabled = _ref.disabled,
       routerComponentName = _ref.routerComponentName;
-  var hasRouter = !!safeVueInstance(thisOrParent).$router;
-  var hasNuxt = !!safeVueInstance(thisOrParent).$nuxt;
+  var hasRouter = !!thisOrParent.$router;
 
   if (!hasRouter || hasRouter && (disabled || !to)) {
     return ANCHOR_TAG;
@@ -9739,14 +9596,14 @@ var computeTag = function computeTag(_ref, thisOrParent) {
   //   if the component is not registered
 
 
-  return routerComponentName || (hasNuxt ? 'nuxt-link' : 'router-link');
+  return routerComponentName || (thisOrParent.$nuxt ? 'nuxt-link' : 'router-link');
 };
 var computeRel = function computeRel() {
   var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       target = _ref2.target,
       rel = _ref2.rel;
 
-  return target === '_blank' && (0,inspect/* isNull */.Ft)(rel) ? 'noopener' : rel || null;
+  return target === '_blank' && (0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isNull */ .Ft)(rel) ? 'noopener' : rel || null;
 };
 var computeHref = function computeHref() {
   var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -9770,15 +9627,15 @@ var computeHref = function computeHref() {
   } // Fallback to `to` prop (if `to` is a string)
 
 
-  if ((0,inspect/* isString */.HD)(to)) {
+  if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isString */ .HD)(to)) {
     return to || toFallback;
   } // Fallback to `to.path' + `to.query` + `to.hash` prop (if `to` is an object)
 
 
-  if ((0,inspect/* isPlainObject */.PO)(to) && (to.path || to.query || to.hash)) {
-    var path = (0,string/* toString */.BB)(to.path);
+  if ((0,_inspect__WEBPACK_IMPORTED_MODULE_2__/* .isPlainObject */ .PO)(to) && (to.path || to.query || to.hash)) {
+    var path = (0,_string__WEBPACK_IMPORTED_MODULE_0__/* .toString */ .BB)(to.path);
     var query = stringifyQueryObj(to.query);
-    var hash = (0,string/* toString */.BB)(to.hash);
+    var hash = (0,_string__WEBPACK_IMPORTED_MODULE_0__/* .toString */ .BB)(to.hash);
     hash = !hash || hash.charAt(0) === '#' ? hash : "#".concat(hash);
     return "".concat(path).concat(query).concat(hash) || toFallback;
   } // If nothing is provided return the fallback
@@ -9794,8 +9651,8 @@ var computeHref = function computeHref() {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   BB: () => (/* binding */ toString),
-/* harmony export */   GL: () => (/* binding */ kebabCase)
+/* harmony export */   "BB": () => (/* binding */ toString),
+/* harmony export */   "GL": () => (/* binding */ kebabCase)
 /* harmony export */ });
 /* unused harmony exports pascalCase, startCase, lowerFirst, upperFirst, escapeRegExp, trimLeft, trimRight, trim, lowerCase, upperCase */
 /* harmony import */ var _constants_regex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3177);
@@ -9876,10 +9733,10 @@ var upperCase = function upperCase(str) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  ZK: () => (/* binding */ warn),
-  Np: () => (/* binding */ warnNoMutationObserverSupport),
-  gs: () => (/* binding */ warnNoPromiseSupport),
-  zl: () => (/* binding */ warnNotClient)
+  "ZK": () => (/* binding */ warn),
+  "Np": () => (/* binding */ warnNoMutationObserverSupport),
+  "gs": () => (/* binding */ warnNoPromiseSupport),
+  "zl": () => (/* binding */ warnNotClient)
 });
 
 // EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/constants/env.js
@@ -9972,135 +9829,15 @@ var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(sourc
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   $B: () => (/* binding */ isVue3),
-/* harmony export */   X$: () => (/* binding */ COMPONENT_UID_KEY),
-/* harmony export */   l7: () => (/* binding */ extend)
+/* harmony export */   "X$": () => (/* binding */ COMPONENT_UID_KEY)
 /* harmony export */ });
-/* unused harmony exports REF_FOR_KEY, nextTick */
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3797);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7203);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var vue_functional_data_merge__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2491);
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
 
  // --- Constants ---
 
 var COMPONENT_UID_KEY = '_uid';
-var isVue3 = vue__WEBPACK_IMPORTED_MODULE_0___default().version.startsWith('3');
-var REF_FOR_KEY = (/* unused pure expression or super */ null && (isVue3 ? 'ref_for' : 'refInFor'));
-var ALLOWED_FIELDS_IN_DATA = ['class', 'staticClass', 'style', 'attrs', 'props', 'domProps', 'on', 'nativeOn', 'directives', 'scopedSlots', 'slot', 'key', 'ref', 'refInFor'];
-var extend = vue__WEBPACK_IMPORTED_MODULE_0___default().extend.bind((vue__WEBPACK_IMPORTED_MODULE_0___default()));
-
-if (isVue3) {
-  var originalExtend = (vue__WEBPACK_IMPORTED_MODULE_0___default().extend);
-  var KNOWN_COMPONENTS = ['router-link', 'transition', 'transition-group'];
-  var originalVModelDynamicCreated = (vue__WEBPACK_IMPORTED_MODULE_0___default().vModelDynamic).created;
-  var originalVModelDynamicBeforeUpdate = (vue__WEBPACK_IMPORTED_MODULE_0___default().vModelDynamic).beforeUpdate; // See https://github.com/vuejs/vue-next/pull/4121 for details
-
-  (vue__WEBPACK_IMPORTED_MODULE_0___default().vModelDynamic).created = function (el, binding, vnode) {
-    originalVModelDynamicCreated.call(this, el, binding, vnode);
-
-    if (!el._assign) {
-      el._assign = function () {};
-    }
-  };
-
-  (vue__WEBPACK_IMPORTED_MODULE_0___default().vModelDynamic).beforeUpdate = function (el, binding, vnode) {
-    originalVModelDynamicBeforeUpdate.call(this, el, binding, vnode);
-
-    if (!el._assign) {
-      el._assign = function () {};
-    }
-  };
-
-  extend = function patchedBootstrapVueExtend(definition) {
-    if (_typeof(definition) === 'object' && definition.render && !definition.__alreadyPatched) {
-      var originalRender = definition.render;
-      definition.__alreadyPatched = true;
-
-      definition.render = function (h) {
-        var patchedH = function patchedH(tag, dataObjOrChildren, rawSlots) {
-          var slots = rawSlots === undefined ? [] : [Array.isArray(rawSlots) ? rawSlots.filter(Boolean) : rawSlots];
-          var isTag = typeof tag === 'string' && !KNOWN_COMPONENTS.includes(tag);
-          var isSecondArgumentDataObject = dataObjOrChildren && _typeof(dataObjOrChildren) === 'object' && !Array.isArray(dataObjOrChildren);
-
-          if (!isSecondArgumentDataObject) {
-            return h.apply(void 0, [tag, dataObjOrChildren].concat(slots));
-          }
-
-          var attrs = dataObjOrChildren.attrs,
-              props = dataObjOrChildren.props,
-              restData = _objectWithoutProperties(dataObjOrChildren, ["attrs", "props"]);
-
-          var normalizedData = _objectSpread(_objectSpread({}, restData), {}, {
-            attrs: attrs,
-            props: isTag ? {} : props
-          });
-
-          if (tag === 'router-link' && !normalizedData.slots && !normalizedData.scopedSlots) {
-            // terrible workaround to fix router-link rendering with compat vue-router
-            normalizedData.scopedSlots = {
-              $hasNormal: function $hasNormal() {}
-            };
-          }
-
-          return h.apply(void 0, [tag, normalizedData].concat(slots));
-        };
-
-        if (definition.functional) {
-          var _ctx$children, _ctx$children$default;
-
-          var ctx = arguments[1];
-
-          var patchedCtx = _objectSpread({}, ctx);
-
-          patchedCtx.data = {
-            attrs: _objectSpread({}, ctx.data.attrs || {}),
-            props: _objectSpread({}, ctx.data.props || {})
-          };
-          Object.keys(ctx.data || {}).forEach(function (key) {
-            if (ALLOWED_FIELDS_IN_DATA.includes(key)) {
-              patchedCtx.data[key] = ctx.data[key];
-            } else if (key in ctx.props) {
-              patchedCtx.data.props[key] = ctx.data[key];
-            } else if (!key.startsWith('on')) {
-              patchedCtx.data.attrs[key] = ctx.data[key];
-            }
-          });
-          var IGNORED_CHILDREN_KEYS = ['_ctx'];
-          var children = ((_ctx$children = ctx.children) === null || _ctx$children === void 0 ? void 0 : (_ctx$children$default = _ctx$children.default) === null || _ctx$children$default === void 0 ? void 0 : _ctx$children$default.call(_ctx$children)) || ctx.children;
-
-          if (children && Object.keys(patchedCtx.children).filter(function (k) {
-            return !IGNORED_CHILDREN_KEYS.includes(k);
-          }).length === 0) {
-            delete patchedCtx.children;
-          } else {
-            patchedCtx.children = children;
-          }
-
-          patchedCtx.data.on = ctx.listeners;
-          return originalRender.call(this, patchedH, patchedCtx);
-        }
-
-        return originalRender.call(this, patchedH);
-      };
-    }
-
-    return originalExtend.call(this, definition);
-  }.bind((vue__WEBPACK_IMPORTED_MODULE_0___default()));
-}
-
-var nextTick = (vue__WEBPACK_IMPORTED_MODULE_0___default().nextTick);
 
 
 /***/ }),
@@ -11948,20 +11685,6 @@ module.exports = function (argument) {
 
 /***/ }),
 
-/***/ 8198:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var requireObjectCoercible = __webpack_require__(9389);
-
-// `ToObject` abstract operation
-// https://tc39.es/ecma262/#sec-toobject
-module.exports = function (argument) {
-  return Object(requireObjectCoercible(argument));
-};
-
-
-/***/ }),
-
 /***/ 2955:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -12200,27 +11923,6 @@ if ($stringify) {
     }
   });
 }
-
-
-/***/ }),
-
-/***/ 135:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-var $ = __webpack_require__(4538);
-var toObject = __webpack_require__(8198);
-var nativeKeys = __webpack_require__(815);
-var fails = __webpack_require__(3009);
-
-var FAILS_ON_PRIMITIVES = fails(function () { nativeKeys(1); });
-
-// `Object.keys` method
-// https://tc39.es/ecma262/#sec-object.keys
-$({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
-  keys: function keys(it) {
-    return nativeKeys(toObject(it));
-  }
-});
 
 
 /***/ }),
@@ -12695,7 +12397,7 @@ __webpack_unused_export__ = ({ value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var Vue = _interopDefault(__webpack_require__(3797));
+var Vue = _interopDefault(__webpack_require__(7203));
 
 function _typeof(obj) {
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -13302,7 +13004,7 @@ exports.Df = wormhole;
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   b: () => (/* binding */ a)
+/* harmony export */   "b": () => (/* binding */ a)
 /* harmony export */ });
 var e=function(){return(e=Object.assign||function(e){for(var t,r=1,s=arguments.length;r<s;r++)for(var a in t=arguments[r])Object.prototype.hasOwnProperty.call(t,a)&&(e[a]=t[a]);return e}).apply(this,arguments)},t={kebab:/-(\w)/g,styleProp:/:(.*)/,styleList:/;(?![^(]*\))/g};function r(e,t){return t?t.toUpperCase():""}function s(e){for(var s,a={},c=0,o=e.split(t.styleList);c<o.length;c++){var n=o[c].split(t.styleProp),i=n[0],l=n[1];(i=i.trim())&&("string"==typeof l&&(l=l.trim()),a[(s=i,s.replace(t.kebab,r))]=l)}return a}function a(){for(var t,r,a={},c=arguments.length;c--;)for(var o=0,n=Object.keys(arguments[c]);o<n.length;o++)switch(t=n[o]){case"class":case"style":case"directives":if(Array.isArray(a[t])||(a[t]=[]),"style"===t){var i=void 0;i=Array.isArray(arguments[c].style)?arguments[c].style:[arguments[c].style];for(var l=0;l<i.length;l++){var y=i[l];"string"==typeof y&&(i[l]=s(y))}arguments[c].style=i}a[t]=a[t].concat(arguments[c][t]);break;case"staticClass":if(!arguments[c][t])break;void 0===a[t]&&(a[t]=""),a[t]&&(a[t]+=" "),a[t]+=arguments[c][t].trim();break;case"on":case"nativeOn":a[t]||(a[t]={});for(var p=0,f=Object.keys(arguments[c][t]||{});p<f.length;p++)r=f[p],a[t][r]?a[t][r]=[].concat(a[t][r],arguments[c][t][r]):a[t][r]=arguments[c][t][r];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":a[t]||(a[t]={}),a[t]=e({},arguments[c][t],a[t]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:a[t]||(a[t]=arguments[c][t])}return a}
 //# sourceMappingURL=lib.esm.js.map
@@ -13310,12 +13012,12 @@ var e=function(){return(e=Object.assign||function(e){for(var t,r=1,s=arguments.l
 
 /***/ }),
 
-/***/ 5617:
+/***/ 505:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ _asyncToGenerator)
+/* harmony export */   "Z": () => (/* binding */ _asyncToGenerator)
 /* harmony export */ });
 /* harmony import */ var core_js_modules_es_object_to_string_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1539);
 /* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8674);
@@ -13354,11 +13056,13 @@ function _asyncToGenerator(fn) {
 
 /***/ }),
 
-/***/ 5226:
+/***/ 7229:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": () => (/* binding */ _classCallCheck)
+/* harmony export */ });
 /* harmony import */ var core_js_modules_es_error_cause_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1703);
 /* harmony import */ var core_js_modules_es_error_to_string_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6647);
 
@@ -13371,13 +13075,15 @@ function _classCallCheck(instance, Constructor) {
 
 /***/ }),
 
-/***/ 7594:
+/***/ 8078:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": () => (/* binding */ _createClass)
+/* harmony export */ });
 /* harmony import */ var core_js_modules_es_object_define_property_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9070);
-/* harmony import */ var _toPropertyKey_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2555);
+/* harmony import */ var _toPropertyKey_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2284);
 
 
 function _defineProperties(target, props) {
@@ -13386,7 +13092,7 @@ function _defineProperties(target, props) {
     descriptor.enumerable = descriptor.enumerable || false;
     descriptor.configurable = true;
     if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, toPropertyKey(descriptor.key), descriptor);
+    Object.defineProperty(target, (0,_toPropertyKey_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .Z)(descriptor.key), descriptor);
   }
 }
 function _createClass(Constructor, protoProps, staticProps) {
@@ -13400,12 +13106,15 @@ function _createClass(Constructor, protoProps, staticProps) {
 
 /***/ }),
 
-/***/ 2415:
-/***/ ((__unused_webpack___webpack_module__, __unused_webpack___webpack_exports__, __webpack_require__) => {
+/***/ 6875:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
-// UNUSED EXPORTS: default
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "Z": () => (/* binding */ _createSuper)
+});
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.reflect.construct.js
 var es_reflect_construct = __webpack_require__(2419);
@@ -13414,7 +13123,7 @@ var es_object_to_string = __webpack_require__(1539);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.reflect.to-string-tag.js
 var es_reflect_to_string_tag = __webpack_require__(1299);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/getPrototypeOf.js
-var esm_getPrototypeOf = __webpack_require__(4370);
+var getPrototypeOf = __webpack_require__(6881);
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/isNativeReflectConstruct.js
 
 
@@ -13435,7 +13144,7 @@ var es_error_cause = __webpack_require__(1703);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.error.to-string.js
 var es_error_to_string = __webpack_require__(6647);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/typeof.js
-var esm_typeof = __webpack_require__(2434);
+var esm_typeof = __webpack_require__(8398);
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js
 
 
@@ -13451,12 +13160,12 @@ function _assertThisInitialized(self) {
 
 
 function _possibleConstructorReturn(self, call) {
-  if (call && (_typeof(call) === "object" || typeof call === "function")) {
+  if (call && ((0,esm_typeof/* default */.Z)(call) === "object" || typeof call === "function")) {
     return call;
   } else if (call !== void 0) {
     throw new TypeError("Derived constructors may only return object or undefined");
   }
-  return assertThisInitialized(self);
+  return _assertThisInitialized(self);
 }
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/createSuper.js
 
@@ -13466,28 +13175,31 @@ function _possibleConstructorReturn(self, call) {
 
 
 function _createSuper(Derived) {
-  var hasNativeReflectConstruct = isNativeReflectConstruct();
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
   return function _createSuperInternal() {
-    var Super = getPrototypeOf(Derived),
+    var Super = (0,getPrototypeOf/* default */.Z)(Derived),
       result;
     if (hasNativeReflectConstruct) {
-      var NewTarget = getPrototypeOf(this).constructor;
+      var NewTarget = (0,getPrototypeOf/* default */.Z)(this).constructor;
       result = Reflect.construct(Super, arguments, NewTarget);
     } else {
       result = Super.apply(this, arguments);
     }
-    return possibleConstructorReturn(this, result);
+    return _possibleConstructorReturn(this, result);
   };
 }
 
 /***/ }),
 
-/***/ 692:
-/***/ ((__unused_webpack___webpack_module__, __unused_webpack___webpack_exports__, __webpack_require__) => {
+/***/ 8291:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
-// UNUSED EXPORTS: default
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "Z": () => (/* binding */ _get)
+});
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.to-string.js
 var es_object_to_string = __webpack_require__(1539);
@@ -13500,12 +13212,12 @@ var es_function_bind = __webpack_require__(4812);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.get-own-property-descriptor.js
 var es_object_get_own_property_descriptor = __webpack_require__(5003);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/getPrototypeOf.js
-var esm_getPrototypeOf = __webpack_require__(4370);
+var getPrototypeOf = __webpack_require__(6881);
 ;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/superPropBase.js
 
 function _superPropBase(object, property) {
   while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = getPrototypeOf(object);
+    object = (0,getPrototypeOf/* default */.Z)(object);
     if (object === null) break;
   }
   return object;
@@ -13522,7 +13234,7 @@ function _get() {
     _get = Reflect.get.bind();
   } else {
     _get = function _get(target, property, receiver) {
-      var base = superPropBase(target, property);
+      var base = _superPropBase(target, property);
       if (!base) return;
       var desc = Object.getOwnPropertyDescriptor(base, property);
       if (desc.get) {
@@ -13536,11 +13248,13 @@ function _get() {
 
 /***/ }),
 
-/***/ 4370:
+/***/ 6881:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-/* unused harmony export default */
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Z": () => (/* binding */ _getPrototypeOf)
+/* harmony export */ });
 /* harmony import */ var core_js_modules_es_object_set_prototype_of_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8304);
 /* harmony import */ var core_js_modules_es_function_bind_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4812);
 /* harmony import */ var core_js_modules_es_object_get_prototype_of_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(489);
@@ -13558,12 +13272,15 @@ function _getPrototypeOf(o) {
 
 /***/ }),
 
-/***/ 2011:
-/***/ ((__unused_webpack___webpack_module__, __unused_webpack___webpack_exports__, __webpack_require__) => {
+/***/ 9542:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
-// UNUSED EXPORTS: default
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "Z": () => (/* binding */ _inherits)
+});
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.error.cause.js
 var es_error_cause = __webpack_require__(1703);
@@ -13610,17 +13327,17 @@ function _inherits(subClass, superClass) {
   Object.defineProperty(subClass, "prototype", {
     writable: false
   });
-  if (superClass) setPrototypeOf(subClass, superClass);
+  if (superClass) _setPrototypeOf(subClass, superClass);
 }
 
 /***/ }),
 
-/***/ 1907:
+/***/ 4799:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ _regeneratorRuntime)
+/* harmony export */   "Z": () => (/* binding */ _regeneratorRuntime)
 /* harmony export */ });
 /* harmony import */ var core_js_modules_es_object_define_property_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9070);
 /* harmony import */ var core_js_modules_es_symbol_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2526);
@@ -13647,7 +13364,7 @@ function _inherits(subClass, superClass) {
 /* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(8674);
 /* harmony import */ var core_js_modules_es_array_reverse_js__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(5069);
 /* harmony import */ var core_js_modules_es_array_slice_js__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(7042);
-/* harmony import */ var _typeof_js__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(2434);
+/* harmony import */ var _typeof_js__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(8398);
 
 
 
@@ -13982,4 +13699,4 @@ function _regeneratorRuntime() {
 /***/ })
 
 }]);
-//# sourceMappingURL=loginRxVuejs.common.351.js.map
+//# sourceMappingURL=loginRxVuejs.umd.87.js.map
