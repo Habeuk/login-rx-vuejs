@@ -4,7 +4,7 @@ namespace Drupal\login_rx_vuejs\EventSubscriber;
 
 use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Drupal\Core\Routing\TrustedRedirectResponse;
@@ -15,7 +15,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
  * Creneaux Shopify event subscriber.
  */
 class loginRxVuejsSubscriber implements EventSubscriberInterface {
-  
+
   /**
    *
    * {@inheritdoc}
@@ -32,7 +32,7 @@ class loginRxVuejsSubscriber implements EventSubscriberInterface {
     // );
     return $events;
   }
-  
+
   /**
    * Le but est etait de permettre à l'utilisateur de pouvoir acceder à une
    * route en mode maintenance, il faut ajouter :
@@ -58,7 +58,7 @@ class loginRxVuejsSubscriber implements EventSubscriberInterface {
   // $maintenance_enabled = \Drupal::state()->get('system.maintenance_mode');
   // $maintenance_url_redirect_enabled =
   // $config->get('maintenance_mode_redirect_active');
-  
+
   // if ($maintenance_enabled === 1 && $maintenance_url_redirect_enabled &&
   // !\Drupal::currentUser()->hasPermission('access site in maintenance mode'))
   // {
@@ -67,12 +67,12 @@ class loginRxVuejsSubscriber implements EventSubscriberInterface {
   // }
   // }
   // }
-  
+
   /**
    * Set header 'Content-Security-Policy' to response to allow embedding in
    * iFrame.
    */
-  public function setHeaderContentSecurityPolicy(FilterResponseEvent $event) {
+  public function setHeaderContentSecurityPolicy(ResponseEvent $event) {
     $response = $event->getResponse();
     // $response->headers->remove( 'X-Frame-Options' );
     // permet de bloquer les popups avec les liens externes.
@@ -83,5 +83,4 @@ class loginRxVuejsSubscriber implements EventSubscriberInterface {
     $response->headers->set('Cross-Origin-Opener-Policy', "same-origin-allow-popups");
     $response->headers->set('Cross-Origin-Embedder-Policy', "unsafe-none");
   }
-  
 }
