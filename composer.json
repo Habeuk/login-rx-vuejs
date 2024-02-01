@@ -11,7 +11,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "drupal/mail_login": "^2.6",
+    "drupal/mail_login": "^3.0.0",
     "drupal/mailsystem": "^4.4",
     "google/apiclient": "^2.11",
     "habeuk/apivuejs": "dev-1x|^1.0",
