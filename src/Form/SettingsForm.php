@@ -72,6 +72,15 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t(' Use compressed files.( prod and dev)'),
       '#default_value' => isset($config['environ_run']) ? $config['environ_run'] : true
     ];
+    $form['apply_on'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t(' apply_on'),
+      '#options' => [
+        'user_login' => 'Login',
+        'user_register' => 'Register'
+      ],
+      '#default_value' => isset($config['apply_on']) ? $config['apply_on'] : []
+    ];
     //
     $form['send_mail'] = [
       '#type' => 'checkbox',
@@ -144,7 +153,7 @@ class SettingsForm extends ConfigFormBase {
     ];
     $form['texts']['submit']['first'] = [
       "#type" => 'textfield',
-      '#title' => $this->t('next label'),
+      '#title' => $this->t('Next label'),
       '#default_value' => isset($config['texts']['submit']['first']) ? $config['texts']['submit']['first'] : "Suivant"
     ];
     $form['texts']['submit']['connect'] = [
@@ -162,11 +171,13 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Label completed'),
       '#default_value' => isset($config['texts']['submit']['final']) ? $config['texts']['submit']['final'] : "Terminée"
     ];
+    $configSite = \Drupal::config('system.site');
+    $site_name = $configSite->get('name');
     $form['texts']['devis_create_user'] = [
       "#type" => 'text_format',
       '#title' => $this->t('text to display after account creation'),
       '#format' => !empty($config['texts']['devis_create_user']['format']) ? $config['texts']['devis_create_user']['format'] : 'full_html',
-      '#default_value' => !empty($config['texts']['devis_create_user']['value']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été creer sur <a href='/'> lesroisdelareno.fr </a>. <br> <strong> Bien vouloir verifier votre boite mail afin de valider votre compte </strong>"
+      '#default_value' => !empty($config['texts']['devis_create_user']['value']) ? $config['texts']['devis_create_user']['value'] : "Votre compte a été créer sur <a href='/'> $site_name </a>. <br> <strong> Bien vouloir vérifier votre boite mail afin de valider votre compte </strong>"
     ];
     $form['texts']['condition_utilisation'] = [
       "#type" => 'text_format',
@@ -174,6 +185,7 @@ class SettingsForm extends ConfigFormBase {
       '#format' => !empty($config['texts']['condition_utilisation']['format']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
       '#default_value' => !empty($config['texts']['condition_utilisation']['value']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
     ];
+    
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
   }
@@ -186,6 +198,7 @@ class SettingsForm extends ConfigFormBase {
     $config = $this->config('login_rx_vuejs.settings');
     $config->set('generate_user', $form_state->getValue('generate_user'));
     $config->set('environ_run', $form_state->getValue('environ_run'));
+    $config->set('apply_on', $form_state->getValue('apply_on'));
     $config->set('add_roles', $form_state->getValue('add_roles'));
     $config->set('url_redirect', $form_state->getValue('url_redirect'));
     $config->set('action_after_login', $form_state->getValue('action_after_login'));
@@ -228,5 +241,4 @@ class SettingsForm extends ConfigFormBase {
       $this->messenger()->addMessage($message);
     }
   }
-  
 }

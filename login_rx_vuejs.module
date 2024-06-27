@@ -39,6 +39,15 @@ function login_rx_vuejs_mail($key, &$message, $params) {
   }
 }
 
+function __check_apply_on($config, $route_name) {
+  $route_name = str_replace(".", "_", $route_name);
+  if (!isset($config['apply_on']))
+    return true;
+  if ($config['apply_on'] && in_array($route_name, $config['apply_on']))
+    return true;
+  return false;
+}
+
 /**
  *
  * @param
@@ -54,23 +63,27 @@ function login_rx_vuejs_preprocess_page(&$variables) {
       'attributes'
     ];
     if (isset($variables['page']['content'])) {
-      $blocks = $variables['page']['content'];
-      foreach ($blocks as $i => $value) {
-        if (!in_array($i, $keys)) {
-          unset($variables['page']['content'][$i]);
-        }
-      }
       // Get config.
       $config = \Drupal::config('login_rx_vuejs.settings')->getRawData();
-      $variables['page']['content']['login_rx_vuejs'] = [
-        '#theme' => "login_rx_vuejs",
-        '#config' => $config
-      ];
-      if (isset($config['environ_run']) && $config['environ_run']) {
-        $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
-      }
-      else {
-        $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register_dev';
+      
+      if (__check_apply_on($config, $route_name)) {
+        $blocks = $variables['page']['content'];
+        foreach ($blocks as $i => $value) {
+          if (!in_array($i, $keys)) {
+            unset($variables['page']['content'][$i]);
+          }
+        }
+        
+        $variables['page']['content']['login_rx_vuejs'] = [
+          '#theme' => "login_rx_vuejs",
+          '#config' => $config
+        ];
+        if (isset($config['environ_run']) && $config['environ_run']) {
+          $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register';
+        }
+        else {
+          $variables['page']['content']['login_rx_vuejs']['#attached']['library'][] = 'login_rx_vuejs/login_register_dev';
+        }
       }
     }
   }
