@@ -13,7 +13,7 @@
 		"drupal/mail_login" : "^3.0.0",
 		"drupal/mailsystem" : "^4.4",
 		"google/apiclient" : "^2.11",
-		"habeuk/apivuejs" : "dev-1x|^1.0",
+		"drupal/apivuejs" : "^1.2.6",
 		"habeuk/drupal_utility" : "^1.0|dev-1x"
 	}
 }
