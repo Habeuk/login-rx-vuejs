@@ -69,16 +69,25 @@ login_rx_vuejs.facebook_login:
   requirements:
     _permission: "access content"
 
-#Verifie les informations d'un utilisateur et cree son compte.
+# Verifie les informations d'un utilisateur et cree son compte.
 # "User data deletion" use by facebokk app.
-login_rx_vuejs.delete_account:
-  path: "/login-rx-vuejs/callback/facebook-delete-aacount"
-  methods: [POST]
+login_rx_vuejs.facebook_delete_account:
+  path: "/login-rx-vuejs/callback/facebook-delete-account"
   defaults:
-    _title: "Example"
+    _title: "Facebook delete account"
     _controller: '\Drupal\login_rx_vuejs\Controller\FacebookController::DeleteAccount'
   requirements:
     _permission: "access content"
+
+# Facebook status deletion
+login_rx_vuejs.facebook_status_deletion:
+  path: "/login-rx-vuejs/callback/facebook-status-delete/{uid}"
+  defaults:
+    _title: "Facebook status account"
+    _controller: '\Drupal\login_rx_vuejs\Controller\FacebookController::StatusDeletionAccount'
+  requirements:
+    _permission: "access content"	
+
 
 #Verifie si un utilisateur est deja connecté, et connecte cet utilisateur.
 login_rx_vuejs.google_check:

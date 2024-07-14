@@ -11,6 +11,7 @@ use Drupal\login_rx_vuejs\Services\loginRxVuejs as UserAuth;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Url;
 
 /**
  * Returns responses for Login rx vuejs routes.
@@ -61,7 +62,55 @@ class FacebookController extends ControllerBase {
    */
   public function DeleteAccount() {
     $content = [];
+    $signed_request = $_POST['signed_request'];
+    $data = $this->parse_signed_request($signed_request);
+    // $user_id = $data['user_id'];
+    
+    // Start data deletion
+    $Url = Url::fromRoute("login_rx_vuejs.facebook_status_deletion", [
+      'uid' => $this->currentUser()->id()
+    ]);
+    $Url->setAbsolute();
+    $Random = new Random();
+    $status_url = $Url->toString();
+    $confirmation_code = $this->currentUser()->id() . '-' . $Random->string();
+    
+    $content = array(
+      'url' => $status_url,
+      'confirmation_code' => $confirmation_code
+    );
     return $this->reponse($content);
+  }
+  
+  /**
+   * Permet de suivre le processus de suppresion.
+   */
+  public function StatusDeletionAccount($uid) {
+    $this->messenger()->addStatus(" Votre compte et toutes les données associer  ont été supprimé ");
+    return [];
+  }
+  
+  protected function parse_signed_request($signed_request) {
+    list($encoded_sig, $payload) = explode('.', $signed_request, 2);
+    
+    $secret = "appsecret"; // Use your app secret here
+                           
+    // Decode the data
+    $sig = $this->base64_url_decode($encoded_sig);
+    $data = json_decode(base64_url_decode($payload), true);
+    
+    // confirm the signature
+    $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = true);
+    if ($sig !== $expected_sig) {
+      error_log('Bad Signed JSON signature!');
+      return null;
+    }
+    
+    return $data;
+  }
+  
+  protected function base64_url_decode($input) {
+    return base64_decode(strtr($input, '-_', '+/'));
   }
   
   /**
