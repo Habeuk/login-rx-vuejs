@@ -73,7 +73,7 @@ class FacebookController extends ControllerBase {
     $Url->setAbsolute();
     $Random = new Random();
     $status_url = $Url->toString();
-    $confirmation_code = $this->currentUser()->id() . '-' . $Random->string();
+    $confirmation_code = $this->currentUser()->id() . '-' . $Random->name();
     
     $content = array(
       'url' => $status_url,
@@ -97,7 +97,7 @@ class FacebookController extends ControllerBase {
                            
     // Decode the data
     $sig = $this->base64_url_decode($encoded_sig);
-    $data = json_decode(base64_url_decode($payload), true);
+    $data = json_decode($this->base64_url_decode($payload), true);
     
     // confirm the signature
     $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = true);
