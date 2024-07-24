@@ -10,7 +10,7 @@
 	],
 	"minimum-stability" : "dev",
 	"require" : {
-		"drupal/mail_login" : "^3.0.0",
+		"drupal/mail_login" : "^4.0.0",
 		"drupal/mailsystem" : "^4.4",
 		"google/apiclient" : "^2.11",
 		"drupal/apivuejs" : "^1.2.6",
