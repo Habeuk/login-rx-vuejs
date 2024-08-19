@@ -12,6 +12,10 @@ use Stephane888\Debug\Repositories\ConfigDrupal;
  *        
  */
 class loginRxVuejs {
+  /**
+   *
+   * @var UserAuth
+   */
   protected $UserAuth;
   protected $configs = [];
   
@@ -27,6 +31,10 @@ class loginRxVuejs {
    */
   public function authentification($username, $password) {
     $uid = $this->UserAuth->authenticate($username, $password);
+    if ($uid) {
+      $account = user_load_by_name($username);
+      $uid = $account->id();
+    }
     return $this->connectUser($uid);
   }
   
@@ -158,5 +166,4 @@ class loginRxVuejs {
     }
     return $this->configs;
   }
-  
 }
