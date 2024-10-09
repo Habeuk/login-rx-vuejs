@@ -163,7 +163,19 @@ class loginRxVuejs {
   public function getConfigs() {
     if (!$this->configs) {
       $this->configs = ConfigDrupal::config('login_rx_vuejs.settings');
+      // try to load translate string.
+      $this->translateArrayKey($this->configs['texts']);
     }
     return $this->configs;
+  }
+  
+  protected function translateArrayKey(&$array) {
+    foreach ($array as $key => &$value) {
+      if (is_array($value)) {
+        $this->translateArrayKey($value);
+      }
+      elseif (is_string($value))
+        $array[$key] = t($value);
+    }
   }
 }
