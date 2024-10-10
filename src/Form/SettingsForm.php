@@ -185,7 +185,62 @@ class SettingsForm extends ConfigFormBase {
       '#format' => !empty($config['texts']['condition_utilisation']['format']) ? $config['texts']['condition_utilisation']['format'] : 'full_html',
       '#default_value' => !empty($config['texts']['condition_utilisation']['value']) ? $config['texts']['condition_utilisation']['value'] : '<p class="text-white"> En vous inscrivant, vous acceptez nos <a href="#"> Conditions d\'utilisation </a> , de recevoir des emails et des MAJ de Habeuk et vous reconnaissez avoir lu notre <a href="#"> Politique de confidentialité</a></p>'
     ];
+    //
+    $form['texts']['log_email'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t('login label'),
+      '#default_value' => isset($config['texts']['log_email']) ? $config['texts']['log_email'] : "Email ou Nom d'utilisateur"
+    ];
+    //
+    $form['texts']['title_login'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title login"),
+      '#default_value' => isset($config['texts']['title_login']) ? $config['texts']['title_login'] : "Connect with"
+    ];
+    $form['texts']['create_compte'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title create compte"),
+      '#default_value' => isset($config['texts']['create_compte']) ? $config['texts']['create_compte'] : "Register"
+    ];
+    //
+    $form['texts']['forget_pass'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title mot de passe oublié"),
+      '#default_value' => isset($config['texts']['forget_pass']) ? $config['texts']['forget_pass'] : "Forgotten password"
+    ];
+    // title_end
+    $form['texts']['title_end'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title end"),
+      '#default_value' => isset($config['texts']['title_end']) ? $config['texts']['title_end'] : "Don't have an account?"
+    ];
+    $form['texts']['back'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title back"),
+      '#default_value' => isset($config['texts']['back']) ? $config['texts']['back'] : "Back"
+    ];
+    $form['texts']['email'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title email"),
+      '#default_value' => isset($config['texts']['email']) ? $config['texts']['email'] : "Your email address"
+    ];
     
+    $form['texts']['info_about_register'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title info_about_register"),
+      '#default_value' => isset($config['texts']['info_about_register']) ? $config['texts']['info_about_register'] : "Your login information will be transferred to this address"
+    ];
+    $form['texts']['title_register_auto'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title title_register_auto"),
+      '#default_value' => isset($config['texts']['title_register_auto']) ? $config['texts']['title_register_auto'] : "Automatic account creation"
+    ];
+    //
+    $form['texts']['titre_create_compte'] = [
+      "#type" => 'textfield',
+      '#title' => $this->t("Title titre_create_compte"),
+      '#default_value' => isset($config['texts']['titre_create_compte']) ? $config['texts']['titre_create_compte'] : "Your account has been created"
+    ];
     // $this->custom_function_name();
     return parent::buildForm($form, $form_state);
   }
