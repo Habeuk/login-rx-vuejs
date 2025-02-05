@@ -46,8 +46,12 @@ var regeneratorRuntime = __webpack_require__(1248);
 var asyncToGenerator = __webpack_require__(8164);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.includes.js
 var es_array_includes = __webpack_require__(4423);
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.regexp.exec.js
+var es_regexp_exec = __webpack_require__(7495);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.includes.js
 var es_string_includes = __webpack_require__(1699);
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.replace.js
+var es_string_replace = __webpack_require__(5440);
 ;// ./node_modules/babel-loader/lib/index.js??clonedRuleSet-82.use[1]!./node_modules/@vue/vue-loader-v15/lib/loaders/templateLoader.js??ruleSet[1].rules[3]!./node_modules/@vue/vue-loader-v15/lib/index.js??vue-loader-options!../wbuutilities/src/Buttons/ButtonSave.vue?vue&type=template&id=29246a2e&scoped=true&lang=html
 var ButtonSavevue_type_template_id_29246a2e_scoped_true_lang_html_render = function render() {
   var _vm = this,
@@ -216,20 +220,28 @@ var ButtonDelete_component = (0,componentNormalizer/* default */.A)(
 /* harmony default export */ const ButtonDelete = (ButtonDelete_component.exports);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.error.to-string.js
 var es_error_to_string = __webpack_require__(6918);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.join.js
-var es_array_join = __webpack_require__(8598);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.date.to-json.js
-var es_date_to_json = __webpack_require__(739);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.date.to-string.js
-var es_date_to_string = __webpack_require__(3288);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
-var es_function_name = __webpack_require__(2010);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.json.stringify.js
-var es_json_stringify = __webpack_require__(3110);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.keys.js
-var es_object_keys = __webpack_require__(9432);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.trim.js
-var es_string_trim = __webpack_require__(2762);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.array.includes.js
+var modules_es_array_includes = __webpack_require__(5331);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.array.join.js
+var es_array_join = __webpack_require__(2634);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.date.to-json.js
+var es_date_to_json = __webpack_require__(8999);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.date.to-string.js
+var es_date_to_string = __webpack_require__(4676);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.function.name.js
+var es_function_name = __webpack_require__(3262);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.json.stringify.js
+var es_json_stringify = __webpack_require__(4474);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.object.keys.js
+var es_object_keys = __webpack_require__(2036);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.object.to-string.js
+var modules_es_object_to_string = __webpack_require__(8239);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.promise.js
+var modules_es_promise = __webpack_require__(7406);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.string.includes.js
+var modules_es_string_includes = __webpack_require__(6543);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/core-js/modules/es.string.trim.js
+var es_string_trim = __webpack_require__(9950);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.btoa.js
 var web_btoa = __webpack_require__(2207);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-exception.constructor.js
@@ -238,8 +250,9 @@ var web_dom_exception_constructor = __webpack_require__(5815);
 var web_dom_exception_stack = __webpack_require__(4979);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-exception.to-string-tag.js
 var web_dom_exception_to_string_tag = __webpack_require__(9739);
-// EXTERNAL MODULE: ../wbuutilities/node_modules/axios/lib/axios.js + 40 modules
-var axios = __webpack_require__(2465);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/axios/index.js
+var axios = __webpack_require__(1872);
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 ;// ../wbuutilities/src/Ajax/basic.js
 
 
@@ -266,7 +279,7 @@ var axios = __webpack_require__(2465);
  * AjaxToastBootStrap.axiosInstance.defaults.timeout = 1200000;
  */
 
-var InstAxios = axios/* default */.A.create({
+var InstAxios = axios_default().create({
   timeout: 300000
 });
 // Surcharge des données d'envoit
@@ -534,10 +547,10 @@ var basicRequest = {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__(9274);
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
-// EXTERNAL MODULE: ./node_modules/bootstrap-vue/esm/components/toast/helpers/bv-toast.js + 3 modules
-var bv_toast = __webpack_require__(7918);
-// EXTERNAL MODULE: ./node_modules/bootstrap-vue/esm/components/modal/index.js + 13 modules
-var modal = __webpack_require__(2788);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/toast/helpers/bv-toast.js + 3 modules
+var bv_toast = __webpack_require__(4193);
+// EXTERNAL MODULE: ../wbuutilities/node_modules/bootstrap-vue/esm/components/modal/index.js + 12 modules
+var modal = __webpack_require__(2295);
 ;// ../wbuutilities/src/Toasts/BootStrap.js
 
 
@@ -824,8 +837,14 @@ if (typeof window !== "undefined" && window.Vue) {
 
 
 
+
+
+var languageId = null;
+if (window.drupalSettings && window.drupalSettings.path && window.drupalSettings.path.pathPrefix != "") {
+  languageId = window.drupalSettings.path.pathPrefix.replace("/", "");
+}
 var config = (0,objectSpread2/* default */.A)((0,objectSpread2/* default */.A)({}, basic), {}, {
-  languageId: window.drupalSettings && window.drupalSettings.path && window.drupalSettings.path.currentLanguage ? window.drupalSettings.path.currentLanguage : null,
+  languageId: languageId,
   // on ne laisse la valeur par defaut, pour permttre au domaine local de pouvoir se connecter.
   TestDomain: window.location.host.includes("localhost") ? "http://habeuk.kksa" : window.location.protocol + "//" + window.location.host,
   /**

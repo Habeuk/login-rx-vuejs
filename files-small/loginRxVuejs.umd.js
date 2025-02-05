@@ -763,7 +763,7 @@ var FunctionPrototype = Function.prototype;
 var apply = FunctionPrototype.apply;
 var call = FunctionPrototype.call;
 
-// eslint-disable-next-line es/no-reflect -- safe
+// eslint-disable-next-line es/no-function-prototype-bind, es/no-reflect -- safe
 module.exports = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? call.bind(apply) : function () {
   return call.apply(apply, arguments);
 });
@@ -815,7 +815,7 @@ module.exports = !fails(function () {
 var NATIVE_BIND = __webpack_require__(616);
 
 var call = Function.prototype.call;
-
+// eslint-disable-next-line es/no-function-prototype-bind -- safe
 module.exports = NATIVE_BIND ? call.bind(call) : function () {
   return call.apply(call, arguments);
 };
@@ -890,6 +890,7 @@ var NATIVE_BIND = __webpack_require__(616);
 
 var FunctionPrototype = Function.prototype;
 var call = FunctionPrototype.call;
+// eslint-disable-next-line es/no-function-prototype-bind -- safe
 var uncurryThisWithBind = NATIVE_BIND && FunctionPrototype.bind.bind(call, call);
 
 module.exports = NATIVE_BIND ? uncurryThisWithBind : function (fn) {
@@ -2595,10 +2596,10 @@ var SHARED = '__core-js_shared__';
 var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
 (store.versions || (store.versions = [])).push({
-  version: '3.38.1',
+  version: '3.40.0',
   mode: IS_PURE ? 'pure' : 'global',
-  copyright: '© 2014-2024 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.38.1/LICENSE',
+  copyright: '© 2014-2025 Denis Pushkarev (zloirock.ru)',
+  license: 'https://github.com/zloirock/core-js/blob/v3.40.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -3044,9 +3045,9 @@ module.exports = function (key) {
 /* eslint-disable es/no-symbol -- required for testing */
 var NATIVE_SYMBOL = __webpack_require__(4495);
 
-module.exports = NATIVE_SYMBOL
-  && !Symbol.sham
-  && typeof Symbol.iterator == 'symbol';
+module.exports = NATIVE_SYMBOL &&
+  !Symbol.sham &&
+  typeof Symbol.iterator == 'symbol';
 
 
 /***/ }),
@@ -3575,6 +3576,8 @@ if (FORCED_PROMISE_CONSTRUCTOR) {
   }
 }
 
+// `Promise` constructor
+// https://tc39.es/ecma262/#sec-promise-executor
 $({ global: true, constructor: true, wrap: true, forced: FORCED_PROMISE_CONSTRUCTOR }, {
   Promise: PromiseConstructor
 });
@@ -4147,7 +4150,7 @@ var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpac
 
 var tag = "#appLoginRegister";
 var loginRegister = function loginRegister() {
-  return Promise.all(/* import() */[__webpack_require__.e(474), __webpack_require__.e(581)]).then(__webpack_require__.bind(__webpack_require__, 8581)).then(function (component) {
+  return Promise.all(/* import() */[__webpack_require__.e(195), __webpack_require__.e(581)]).then(__webpack_require__.bind(__webpack_require__, 8581)).then(function (component) {
     return new Promise(function (resolv) {
       var callback = function callback() {
         resolv(component);
